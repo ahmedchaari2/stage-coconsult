@@ -1,0 +1,274 @@
+<app-prescription-edit-modal (saved)="onPrescriptionSaved()" />
+
+<ng-template #prescriptionsModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ 'prescription.modal.title' | transloco }}
+      @if (consultation(); as c) {
+        <span class="text-muted f-14 fw-normal ms-1">— {{ c.motif }}</span>
+      }
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="form-check form-switch mb-0">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="prescriptionsShowArchived"
+          [ngModel]="showArchived()"
+          (ngModelChange)="onShowArchivedChange($event)"
+        />
+        <label class="form-check-label" for="prescriptionsShowArchived">{{ 'prescription.modal.showArchivedLabel' | transloco }}</label>
+      </div>
+      @if (!formOpen()) {
+        <button type="button" class="btn btn-primary btn-sm" (click)="openCreateForm()">
+          <i antIcon type="plus" theme="outline" class="me-1"></i>
+          {{ 'prescription.modal.addButton' | transloco }}
+        </button>
+      }
+    </div>
+
+    @if (formOpen()) {
+      <form #prescriptionForm="ngForm" (ngSubmit)="onSubmitForm(prescriptionForm)" class="border rounded p-3 mb-3">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label required" for="prescriptionMedicament">{{ 'prescription.fields.medicament' | transloco }}</label>
+            <input
+              type="text"
+              id="prescriptionMedicament"
+              class="form-control"
+              name="medicament"
+              [(ngModel)]="formModel.medicament"
+              required
+              #medicamentField="ngModel"
+              [class.is-invalid]="formSubmitted() && medicamentField.invalid"
+              [placeholder]="'prescription.placeholders.medicament' | transloco"
+            />
+            @if (formSubmitted() && medicamentField.invalid) {
+              <div class="invalid-feedback">{{ 'prescription.errors.medicamentRequired' | transloco }}</div>
+            }
+          </div>
+          <div class="col-md-6">
+            <label class="form-label required" for="prescriptionPosologie">{{ 'prescription.fields.posologie' | transloco }}</label>
+            <input
+              type="text"
+              id="prescriptionPosologie"
+              class="form-control"
+              name="posologie"
+              [(ngModel)]="formModel.posologie"
+              required
+              #posologieField="ngModel"
+              [class.is-invalid]="formSubmitted() && posologieField.invalid"
+              [placeholder]="'prescription.placeholders.posologie' | transloco"
+            />
+            @if (formSubmitted() && posologieField.invalid) {
+              <div class="invalid-feedback">{{ 'prescription.errors.posologieRequired' | transloco }}</div>
+            }
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="prescriptionDuree">{{ 'prescription.fields.dureeJours' | transloco }}</label>
+            <input
+              type="number"
+              id="prescriptionDuree"
+              class="form-control"
+              name="dureeJours"
+              min="1"
+              [(ngModel)]="formModel.dureeJours"
+              #dureeField="ngModel"
+              [class.is-invalid]="formSubmitted() && dureeField.invalid"
+              [placeholder]="'prescription.placeholders.dureeJours' | transloco"
+            />
+            @if (formSubmitted() && dureeField.invalid) {
+              <div class="invalid-feedback">{{ 'prescription.errors.dureeJoursInvalid' | transloco }}</div>
+            }
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="prescriptionInstructions">{{ 'prescription.fields.instructions' | transloco }}</label>
+            <textarea
+              id="prescriptionInstructions"
+              class="form-control"
+              name="instructions"
+              rows="2"
+              [(ngModel)]="formModel.instructions"
+              [placeholder]="'prescription.placeholders.instructions' | transloco"
+            ></textarea>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="prescriptionRenouvelable"
+                name="renouvelable"
+                [(ngModel)]="formModel.renouvelable"
+              />
+              <label class="form-check-label" for="prescriptionRenouvelable">{{ 'prescription.fields.renouvelable' | transloco }}</label>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelForm()">
+            {{ 'common.buttons.cancel' | transloco }}
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm" [disabled]="formSubmitting()">
+            @if (formSubmitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            }
+            {{ 'common.buttons.save' | transloco }}
+          </button>
+        </div>
+      </form>
+    }
+
+    @if (loading()) {
+      <div class="text-center p-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+        </div>
+      </div>
+    } @else if (loadError()) {
+      <div class="alert alert-danger m-0" role="alert">
+        {{ loadError() }}
+        <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="loadPrescriptions()">
+          {{ 'common.buttons.retry' | transloco }}
+        </button>
+      </div>
+    } @else if (prescriptions().length === 0) {
+      <div class="text-center p-4">
+        <p class="text-muted mb-0">{{ 'prescription.modal.empty' | transloco }}</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">{{ 'prescription.fields.medicament' | transloco }}</th>
+              <th scope="col">{{ 'prescription.fields.posologie' | transloco }}</th>
+              <th scope="col">{{ 'prescription.fields.dureeJours' | transloco }}</th>
+              <th scope="col">{{ 'prescription.fields.instructions' | transloco }}</th>
+              <th scope="col" class="text-center">{{ 'common.labels.actions' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of prescriptions(); track p.id) {
+              <tr>
+                <td>
+                  {{ p.medicament }}
+                  @if (p.renouvelable) {
+                    <span
+                      class="badge rounded-pill bg-info-subtle text-info ms-1"
+                      [ngbTooltip]="'prescription.fields.renouvelable' | transloco"
+                      container="body"
+                    >
+                      {{ 'prescription.badges.renouvelable' | transloco }}
+                    </span>
+                  }
+                  @if (p.archived) {
+                    <span class="badge rounded-pill bg-secondary ms-1">{{ 'common.labels.archived' | transloco }}</span>
+                  }
+                </td>
+                <td>{{ p.posologie }}</td>
+                <td>{{ p.dureeJours ? p.dureeJours + ' ' + ('prescription.fields.jours' | transloco) : '—' }}</td>
+                <td>{{ p.instructions || '—' }}</td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm" role="group">
+                    @if (p.archived) {
+                      <button
+                        type="button"
+                        class="btn btn-outline-success"
+                        (click)="onArchiveToggle(p)"
+                        [ngbTooltip]="'common.buttons.restore' | transloco"
+                        [attr.aria-label]="'common.buttons.restore' | transloco"
+                        container="body"
+                      >
+                        <i antIcon type="rollback" theme="outline"></i>
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        (click)="openEditForm(p)"
+                        [ngbTooltip]="'common.buttons.edit' | transloco"
+                        [attr.aria-label]="'common.buttons.edit' | transloco"
+                        container="body"
+                      >
+                        <i antIcon type="edit" theme="outline"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        (click)="onArchiveToggle(p)"
+                        [ngbTooltip]="'common.buttons.archive' | transloco"
+                        [attr.aria-label]="'common.buttons.archive' | transloco"
+                        container="body"
+                      >
+                        <i antIcon type="inbox" theme="outline"></i>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+  <div class="modal-footer">
+    <span
+      class="d-inline-block"
+      [ngbTooltip]="
+        activeCount() === 0 ? ('prescription.ordonnance.emptyTooltip' | transloco) : ('prescription.ordonnance.tooltip' | transloco)
+      "
+      container="body"
+    >
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        [disabled]="activeCount() === 0 || ordonnanceLoading()"
+        (click)="onPrintOrdonnance()"
+      >
+        @if (ordonnanceLoading()) {
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        } @else {
+          <i antIcon type="printer" theme="outline" class="me-1"></i>
+        }
+        {{ 'prescription.ordonnance.button' | transloco }}
+      </button>
+    </span>
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #confirmArchiveModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (pendingAction === 'restore' ? 'prescription.restoreModal.title' : 'prescription.archiveModal.title') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    {{ (pendingAction === 'restore' ? 'prescription.restoreModal.body' : 'prescription.archiveModal.body') | transloco }}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    @if (pendingAction === 'restore') {
+      <button type="button" class="btn btn-success" (click)="modal.close('confirm')">
+        <i antIcon type="rollback" theme="outline" class="me-1"></i>
+        {{ 'common.buttons.restore' | transloco }}
+      </button>
+    } @else {
+      <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">
+        <i antIcon type="inbox" theme="outline" class="me-1"></i>
+        {{ 'common.buttons.archive' | transloco }}
+      </button>
+    }
+  </div>
+</ng-template>

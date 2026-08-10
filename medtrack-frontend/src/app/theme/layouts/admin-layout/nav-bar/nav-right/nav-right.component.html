@@ -1,0 +1,135 @@
+<ul class="list-unstyled">
+  <li class="pc-h-item" ngbDropdown (openChange)="onNotificationDropdownOpenChange($event)">
+    <a
+      href="javascript:void(0)"
+      class="pc-head-link dropdown-toggle arrow-none me-0 bg-gray-200"
+      data-bs-toggle="dropdown"
+      ngbDropdownToggle
+      role="button"
+      [attr.aria-label]="'notifications.title' | transloco"
+    >
+      <i antIcon type="bell" theme="outline" aria-hidden="true"></i>
+      @if (unreadCount() > 0) {
+        <span class="badge bg-primary pc-h-badge">{{ unreadCount() }}</span>
+      }
+    </a>
+    <div class="dropdown-notification dropdown-menu-end pc-h-dropdown" ngbDropdownMenu>
+      <div class="dropdown-header d-flex align-items-center justify-content-between">
+        <h5 class="m-0">{{ 'notifications.title' | transloco }}</h5>
+      </div>
+      <div class="dropdown-divider mb-0"></div>
+      <ng-scrollbar class="notification-scroll" visibility="hover">
+        <div class="dropdown-header p-0 text-wrap header-notification-scroll">
+          @if (notifications().length === 0) {
+            <p class="text-muted text-center p-4 mb-0">{{ 'notifications.empty' | transloco }}</p>
+          } @else {
+            <div class="list-group list-group-flush w-100">
+              @for (n of notifications(); track n.id) {
+                <a
+                  href="javascript:void(0)"
+                  class="list-group-item list-group-item-action"
+                  [class.bg-light-primary]="!n.read"
+                  (click)="onNotificationClick(n)"
+                >
+                  <div class="d-flex">
+                    <div class="flex-shrink-0">
+                      <div class="user-avatar bg-light-primary"><i class="d-flex" antIcon theme="outline" type="calendar"></i></div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                      <p class="text-body mb-0">{{ notificationLabel(n) }}</p>
+                      <span class="text-muted">{{ notificationRelativeTime(n) }}</span>
+                    </div>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        </div>
+      </ng-scrollbar>
+      @if (hasMoreNotifications()) {
+        <div class="dropdown-divider mt-0"></div>
+        <div class="text-center py-2">
+          <button
+            type="button"
+            class="btn btn-link btn-sm text-decoration-none"
+            [disabled]="loadingMoreNotifications()"
+            (click)="onLoadMoreNotifications()"
+          >
+            @if (loadingMoreNotifications()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            }
+            {{ 'notifications.loadMore' | transloco }}
+          </button>
+        </div>
+      }
+    </div>
+  </li>
+  <li class="pc-h-item" ngbDropdown>
+    <a
+      href="javascript:void(0)"
+      class="pc-head-link dropdown-toggle arrow-none me-0 bg-gray-200"
+      data-bs-toggle="dropdown"
+      ngbDropdownToggle
+    >
+      <span class="f-w-600 text-uppercase">{{ currentLang }}</span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-end pc-h-dropdown" ngbDropdownMenu>
+      <a href="javascript:void(0)" class="dropdown-item" [class.active]="currentLang === 'fr'" (click)="setLanguage('fr')">Français</a>
+      <a href="javascript:void(0)" class="dropdown-item" [class.active]="currentLang === 'en'" (click)="setLanguage('en')">English</a>
+    </div>
+  </li>
+  <li class="pc-h-item header-user-profile" ngbDropdown>
+    <a href="javascript:void(0)" class="pc-head-link arrow-none me-0" ngbDropdownToggle>
+      <img [src]="currentUser?.photoUrl || 'assets/images/user/avatar-default.svg'" alt="user-image" class="user-avatar me-2" />
+      <span class="f-w-600">{{ userFullName }}</span>
+    </a>
+    <div class="dropdown-user-profile dropdown-menu-end pc-h-dropdown" ngbDropdownMenu>
+      <div class="dropdown-header">
+        <div class="d-flex mb-1">
+          <div class="flex-shrink-0">
+            <img [src]="currentUser?.photoUrl || 'assets/images/user/avatar-default.svg'" alt="user-image" class="user-avatar wid-35" />
+          </div>
+          <div class="flex-grow-1 ms-3 text-start">
+            <h6 class="mb-0">{{ userFullName }}</h6>
+            <span>{{ userRole }}</span>
+          </div>
+          <a
+            href="javascript:void(0)"
+            class="bg-transparent"
+            role="button"
+            (click)="logout()"
+            [attr.aria-label]="'nav.profile.logout' | transloco"
+          >
+            <i class="d-flex f-20" antIcon theme="outline" type="logout" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+      <ul ngbNav #nav="ngbNav" class="drp-tabs nav-fill nav-tabs">
+        <li ngbNavItem="1">
+          <a ngbNavLink>
+            <i antIcon theme="outline" type="user" class="me-2"></i>
+            {{ 'nav.profile.tab' | transloco }}
+          </a>
+          <ng-template ngbNavContent>
+            @for (task of profile; track task) {
+              <div>
+                @if (task.icon === 'logout') {
+                  <a href="javascript:void(0)" class="dropdown-item" (click)="logout()">
+                    <i class="text-muted" antIcon theme="outline" type="{{ task.icon }}"></i>
+                    <span>{{ task.title | transloco }}</span>
+                  </a>
+                } @else {
+                  <a class="dropdown-item" [routerLink]="task.route">
+                    <i class="text-muted" antIcon theme="outline" type="{{ task.icon }}"></i>
+                    <span>{{ task.title | transloco }}</span>
+                  </a>
+                }
+              </div>
+            }
+          </ng-template>
+        </li>
+      </ul>
+      <div [ngbNavOutlet]="nav"></div>
+    </div>
+  </li>
+</ul>

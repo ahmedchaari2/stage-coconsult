@@ -1,0 +1,72 @@
+<div class="advanced-filters">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <div class="input-group search-box flex-grow-1" style="min-width: 200px; max-width: 360px">
+      <span class="input-group-text"><i antIcon type="search" theme="outline"></i></span>
+      <input
+        type="search"
+        class="form-control"
+        [ngModel]="quickSearchValue()"
+        (ngModelChange)="quickSearchValueChange.emit($event)"
+        appDebounceInput
+        (debouncedInput)="quickSearchDebounced.emit($event)"
+        [placeholder]="quickSearchPlaceholder() ?? ('common.search.placeholder' | transloco)"
+        [attr.aria-label]="'common.search.label' | transloco"
+      />
+      @if (quickSearchValue().length > 0) {
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-close-search"
+        [attr.aria-label]="'common.search.clear' | transloco"
+        (click)="clearQuickSearch()"
+      >
+        <span class="btn-close"></span>
+      </button>
+      }
+    </div>
+
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="panelOpen.set(!panelOpen())" [attr.aria-expanded]="panelOpen()">
+      <i antIcon type="filter" theme="outline" class="me-1"></i>
+      {{ 'common.filters.button' | transloco }} @if (activeFilterCount() > 0) {
+      <span class="badge rounded-pill bg-primary ms-1">{{ activeFilterCount() }}</span>
+      }
+    </button>
+
+    <button type="button" class="btn btn-link btn-sm text-decoration-none" [disabled]="!hasAnythingActive()" (click)="resetAll.emit()">
+      {{ 'common.filters.reset' | transloco }}
+    </button>
+  </div>
+
+  @if (panelOpen()) {
+  <div class="advanced-filters-panel mt-3 p-3">
+    <div class="advanced-filters-panel-header d-md-none d-flex align-items-center justify-content-between mb-3">
+      <span class="fw-semibold">{{ 'common.filters.button' | transloco }}</span>
+      <button
+        type="button"
+        class="btn-close"
+        [attr.aria-label]="'common.filters.close' | transloco"
+        (click)="panelOpen.set(false)"
+      ></button>
+    </div>
+
+    <ng-content></ng-content>
+
+    <div class="advanced-filters-panel-apply d-md-none mt-3">
+      <button type="button" class="btn btn-primary w-100" (click)="applyAndClose()">{{ 'common.filters.apply' | transloco }}</button>
+    </div>
+  </div>
+  } @if (chips().length > 0) {
+  <div class="advanced-filters-chips mt-2 d-flex flex-wrap gap-2">
+    @for (chip of chips(); track chip.key) {
+    <span class="badge rounded-pill filter-chip">
+      {{ chip.label }} : {{ chip.value }}
+      <button
+        type="button"
+        class="btn-close btn-close-chip ms-1"
+        [attr.aria-label]="'common.filters.removeFilter' | transloco"
+        (click)="chipRemove.emit(chip.key)"
+      ></button>
+    </span>
+    }
+  </div>
+  }
+</div>

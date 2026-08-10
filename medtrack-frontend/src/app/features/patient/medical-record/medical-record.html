@@ -1,0 +1,667 @@
+<div class="medical-record mt-4">
+  @if (loadError()) {
+  <div class="alert alert-danger" role="alert">{{ loadError() }}</div>
+  } @if (isLoading()) {
+  <div class="text-center p-4">
+    <app-spinner [backgroundColor]="'var(--bs-primary)'" [spinner]="spinkit" />
+    <p class="mt-3 text-muted mb-0">{{ 'medicalRecord.loading' | transloco }}</p>
+  </div>
+  } @else if (notFound()) {
+  <div class="text-center p-4 border rounded">
+    <i antIcon type="file-text" theme="outline" class="f-48 text-muted mb-3"></i>
+    <h6 class="text-muted mb-3">{{ 'medicalRecord.empty.title' | transloco }}</h6>
+    @if (canEdit()) {
+    <button type="button" class="btn btn-primary" (click)="openCreateRecordModal()">{{ 'medicalRecord.createButton' | transloco }}</button>
+    }
+  </div>
+  } @else if (record(); as r) {
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">{{ 'medicalRecord.sectionTitle' | transloco }}</h5>
+    @if (canEdit()) {
+    <button type="button" class="btn btn-outline-primary btn-sm" (click)="openEditRecordModal()">
+      <i antIcon type="edit" theme="outline" class="me-1"></i>
+      {{ 'common.buttons.edit' | transloco }}
+    </button>
+    }
+  </div>
+
+  <nav class="medical-record-section-nav mb-4" [attr.aria-label]="'medicalRecord.navigation.label' | transloco">
+    <ul class="nav nav-pills gap-2" role="tablist">
+      <li class="nav-item">
+        <button
+          type="button"
+          class="nav-link"
+          role="tab"
+          aria-controls="medical-record-summary"
+          [class.active]="activeSection() === 'summary'"
+          [attr.aria-selected]="activeSection() === 'summary'"
+          (click)="setActiveSection('summary')"
+        >
+          <i antIcon type="file-text" theme="outline" class="me-1"></i>
+          {{ 'medicalRecord.navigation.summary' | transloco }}
+        </button>
+      </li>
+      <li class="nav-item">
+        <button
+          type="button"
+          class="nav-link"
+          role="tab"
+          aria-controls="medical-record-consultations"
+          [class.active]="activeSection() === 'consultations'"
+          [attr.aria-selected]="activeSection() === 'consultations'"
+          (click)="setActiveSection('consultations')"
+        >
+          <i antIcon type="medicine-box" theme="outline" class="me-1"></i>
+          {{ 'medicalRecord.consultations.title' | transloco }}
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  @if (activeSection() === 'summary') {
+  <div id="medical-record-summary" class="row g-3 mb-4 medical-record-section" tabindex="-1">
+    <div class="col-md-4">
+      <label class="form-label text-muted mb-1">{{ 'medicalRecord.fields.groupeSanguin' | transloco }}</label>
+      <p class="form-control-plaintext f-w-500">{{ groupeSanguinLabel(r.groupeSanguin) }}</p>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label text-muted mb-1">{{ 'medicalRecord.fields.allergies' | transloco }}</label>
+      <p class="form-control-plaintext">{{ r.allergies }}</p>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label text-muted mb-1">{{ 'medicalRecord.fields.antecedents' | transloco }}</label>
+      <p class="form-control-plaintext">{{ r.antecedents }}</p>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label text-muted mb-1">{{ 'medicalRecord.fields.traitementsChroniques' | transloco }}</label>
+      <p class="form-control-plaintext">{{ r.traitementsChroniques || '—' }}</p>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label text-muted mb-1">{{ 'medicalRecord.fields.antecedentsFamiliaux' | transloco }}</label>
+      <p class="form-control-plaintext">{{ r.antecedentsFamiliaux || '—' }}</p>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label text-muted mb-1">{{ 'medicalRecord.fields.vaccinations' | transloco }}</label>
+      <p class="form-control-plaintext">{{ r.vaccinations || '—' }}</p>
+    </div>
+  </div>
+
+  @if (traceabilityLine(r.createdBy, r.createdAt, r.modifiedBy, r.updatedAt); as trace) {
+  <p class="text-muted f-12 mb-3">{{ trace }}</p>
+  } } @else {
+  <div
+    id="medical-record-consultations"
+    class="d-flex justify-content-between align-items-center mb-3 mt-4 medical-record-section"
+    tabindex="-1"
+  >
+    <h6 class="mb-0">{{ 'medicalRecord.consultations.title' | transloco }}</h6>
+    <div class="d-flex align-items-center gap-3">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        style="max-width: 220px"
+        [ngModel]="searchInput()"
+        (ngModelChange)="searchInput.set($event)"
+        appDebounceInput
+        (debouncedInput)="onConsultationsSearchChange($event)"
+        [placeholder]="'medicalRecord.consultations.filters.searchPlaceholder' | transloco"
+      />
+      <div class="form-check form-switch mb-0">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="consultationsShowArchivedFilter"
+          [ngModel]="showArchivedFilter()"
+          (ngModelChange)="onShowArchivedFilterChange($event)"
+        />
+        <label class="form-check-label" for="consultationsShowArchivedFilter">
+          {{ 'medicalRecord.consultations.filters.showArchivedLabel' | transloco }}
+        </label>
+      </div>
+      @if (canEdit()) {
+      <button type="button" class="btn btn-primary btn-sm" (click)="openCreateConsultation()">
+        <i antIcon type="plus" theme="outline" class="me-1"></i>
+        {{ 'medicalRecord.consultations.addButton' | transloco }}
+      </button>
+      }
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    @if (consultationsLoading()) {
+    <div class="text-center p-4">
+      <app-spinner [backgroundColor]="'var(--bs-primary)'" [spinner]="spinkit" />
+      <p class="mt-3 text-muted mb-0">{{ 'medicalRecord.consultations.loading' | transloco }}</p>
+    </div>
+    } @else if (consultationsError()) {
+    <div class="alert alert-danger m-0" role="alert">
+      {{ consultationsError() }}
+      <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="loadConsultations()">
+        {{ 'common.buttons.retry' | transloco }}
+      </button>
+    </div>
+    } @else if (displayedConsultations().length === 0) {
+    <div class="text-center p-4">
+      <p class="text-muted mb-0">{{ 'medicalRecord.consultations.empty' | transloco }}</p>
+    </div>
+    } @else {
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th scope="col" appSortableColumn="consultationDate" [sortState]="sortState()" (sortChange)="onConsultationsSortChange($event)">
+            {{ 'medicalRecord.consultations.columns.date' | transloco }}
+          </th>
+          <th scope="col" appSortableColumn="motif" [sortState]="sortState()" (sortChange)="onConsultationsSortChange($event)">
+            {{ 'medicalRecord.consultations.columns.motif' | transloco }}
+          </th>
+          <th scope="col">{{ 'medicalRecord.consultations.columns.diagnostic' | transloco }}</th>
+          <th scope="col">{{ 'medicalRecord.consultations.columns.notes' | transloco }}</th>
+          <th scope="col">{{ 'medicalRecord.consultations.columns.vitals' | transloco }}</th>
+          <th scope="col">{{ 'medicalRecord.consultations.columns.medecin' | transloco }}</th>
+          <th scope="col" class="text-center">{{ 'common.labels.actions' | transloco }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of displayedConsultations(); track c.id) {
+        <tr
+          [id]="'consultation-' + c.id"
+          [class.table-active]="focusedConsultation()?.id === c.id"
+          [attr.aria-current]="focusedConsultation()?.id === c.id ? 'true' : null"
+        >
+          <td>
+            {{ c.consultationDate | dateFormat }} @if (c.archived) {
+            <span class="badge rounded-pill bg-secondary ms-1">{{ 'common.labels.archived' | transloco }}</span>
+            } @if (consultationTraceability(c); as trace) {
+            <i
+              antIcon
+              type="info-circle"
+              theme="outline"
+              class="text-muted ms-1"
+              style="font-size: 12px; cursor: help"
+              [ngbTooltip]="trace"
+              container="body"
+              role="img"
+              [attr.aria-label]="trace"
+            ></i>
+            }
+          </td>
+          <td>{{ c.motif }}</td>
+          <td>{{ c.diagnostic }}</td>
+          <td>{{ c.notes || '—' }}</td>
+          <td class="text-nowrap">{{ vitalsSummary(c) }}</td>
+          <td>
+            <!-- La fiche médecin est réservée à l'admin : simple libellé pour les autres. -->
+            @if (isAdmin()) {
+            <a
+              class="table-record-link"
+              [routerLink]="['/medecins', c.medecinId]"
+              [attr.aria-label]="('common.buttons.view' | transloco) + ' ' + medecinDisplay(c.medecinId)"
+            >
+              {{ medecinDisplay(c.medecinId) }}
+            </a>
+            } @else {
+            {{ medecinDisplay(c.medecinId) }}
+            }
+          </td>
+          <td class="text-center">
+            <div class="btn-group btn-group-sm" role="group">
+              <a
+                class="btn btn-outline-primary"
+                [routerLink]="['/patients', patientId()]"
+                [queryParams]="{ consultationId: c.id }"
+                [ngbTooltip]="'common.buttons.view' | transloco"
+                [attr.aria-label]="'common.buttons.view' | transloco"
+                container="body"
+                (click)="onViewConsultationClick($event, c)"
+              >
+                <i antIcon type="eye" theme="outline"></i>
+              </a>
+              @if (canEdit()) {
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                (click)="onOpenPrescriptions(c)"
+                [ngbTooltip]="'prescription.modal.tooltip' | transloco"
+                [attr.aria-label]="'prescription.modal.tooltip' | transloco"
+                container="body"
+              >
+                <i antIcon type="medicine-box" theme="outline"></i>
+              </button>
+              @if (c.archived) {
+              <button
+                type="button"
+                class="btn btn-outline-success"
+                (click)="onArchiveToggleConsultation(c)"
+                [ngbTooltip]="'common.buttons.restore' | transloco"
+                [attr.aria-label]="'common.buttons.restore' | transloco"
+                container="body"
+              >
+                <i antIcon type="rollback" theme="outline"></i>
+              </button>
+              } @else {
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="openEditConsultation(c)"
+                [ngbTooltip]="'common.buttons.edit' | transloco"
+                [attr.aria-label]="'common.buttons.edit' | transloco"
+                container="body"
+              >
+                <i antIcon type="edit" theme="outline"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                (click)="onArchiveToggleConsultation(c)"
+                [ngbTooltip]="'common.buttons.archive' | transloco"
+                [attr.aria-label]="'common.buttons.archive' | transloco"
+                container="body"
+              >
+                <i antIcon type="inbox" theme="outline"></i>
+              </button>
+              } }
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <div class="p-3 border-top">
+      <app-pagination
+        [page]="page()"
+        [totalPages]="totalPages()"
+        [totalElements]="totalElements()"
+        [size]="size()"
+        (pageChange)="onPageChange($event)"
+        (sizeChange)="onSizeChange($event)"
+      />
+    </div>
+    }
+  </div>
+  } }
+</div>
+
+<app-prescriptions-modal />
+
+<ng-template #recordModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (recordMode === 'create' ? 'medicalRecord.form.createTitle' : 'medicalRecord.form.editTitle') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <form #recordForm="ngForm" (ngSubmit)="onSubmitRecord(recordForm, modal)">
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label required" for="recordGroupeSanguin">{{ 'medicalRecord.fields.groupeSanguin' | transloco }}</label>
+          <select
+            id="recordGroupeSanguin"
+            class="form-control"
+            name="groupeSanguin"
+            [(ngModel)]="recordModel.groupeSanguin"
+            required
+            #groupeSanguinField="ngModel"
+            [class.is-invalid]="recordSubmitted() && recordModel.groupeSanguin === null"
+          >
+            <option [ngValue]="null" disabled>{{ 'medicalRecord.form.groupeSanguinPlaceholder' | transloco }}</option>
+            @for (opt of groupeSanguinOptions; track opt) {
+            <option [ngValue]="opt">{{ groupeSanguinLabel(opt) }}</option>
+            }
+          </select>
+          @if (recordSubmitted() && recordModel.groupeSanguin === null) {
+          <div class="invalid-feedback d-block">{{ 'medicalRecord.form.groupeSanguinRequired' | transloco }}</div>
+          }
+        </div>
+        <div class="col-12">
+          <label class="form-label required" for="recordAllergies">{{ 'medicalRecord.fields.allergies' | transloco }}</label>
+          <textarea
+            id="recordAllergies"
+            class="form-control"
+            name="allergies"
+            rows="2"
+            [(ngModel)]="recordModel.allergies"
+            required
+            #allergiesField="ngModel"
+            [class.is-invalid]="recordSubmitted() && allergiesField.invalid"
+            [placeholder]="'medicalRecord.form.allergiesPlaceholder' | transloco"
+          ></textarea>
+          @if (recordSubmitted() && allergiesField.invalid) {
+          <div class="invalid-feedback">{{ 'medicalRecord.form.allergiesRequired' | transloco }}</div>
+          }
+        </div>
+        <div class="col-12">
+          <label class="form-label required" for="recordAntecedents">{{ 'medicalRecord.fields.antecedents' | transloco }}</label>
+          <textarea
+            id="recordAntecedents"
+            class="form-control"
+            name="antecedents"
+            rows="2"
+            [(ngModel)]="recordModel.antecedents"
+            required
+            #antecedentsField="ngModel"
+            [class.is-invalid]="recordSubmitted() && antecedentsField.invalid"
+            [placeholder]="'medicalRecord.form.antecedentsPlaceholder' | transloco"
+          ></textarea>
+          @if (recordSubmitted() && antecedentsField.invalid) {
+          <div class="invalid-feedback">{{ 'medicalRecord.form.antecedentsRequired' | transloco }}</div>
+          }
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="recordTraitementsChroniques">{{ 'medicalRecord.fields.traitementsChroniques' | transloco }}</label>
+          <textarea
+            id="recordTraitementsChroniques"
+            class="form-control"
+            name="traitementsChroniques"
+            rows="2"
+            [(ngModel)]="recordModel.traitementsChroniques"
+            [placeholder]="'medicalRecord.form.traitementsChroniquesPlaceholder' | transloco"
+          ></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="recordAntecedentsFamiliaux">{{ 'medicalRecord.fields.antecedentsFamiliaux' | transloco }}</label>
+          <textarea
+            id="recordAntecedentsFamiliaux"
+            class="form-control"
+            name="antecedentsFamiliaux"
+            rows="2"
+            [(ngModel)]="recordModel.antecedentsFamiliaux"
+            [placeholder]="'medicalRecord.form.antecedentsFamiliauxPlaceholder' | transloco"
+          ></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="recordVaccinations">{{ 'medicalRecord.fields.vaccinations' | transloco }}</label>
+          <textarea
+            id="recordVaccinations"
+            class="form-control"
+            name="vaccinations"
+            rows="2"
+            [(ngModel)]="recordModel.vaccinations"
+            [placeholder]="'medicalRecord.form.vaccinationsPlaceholder' | transloco"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.cancel' | transloco }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="recordSubmitting()">
+        @if (recordSubmitting()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        } {{ 'common.buttons.save' | transloco }}
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #consultationModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (consultationMode === 'create' ? 'medicalRecord.consultations.addTitle' : 'medicalRecord.consultations.editTitle') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <form #consultationForm="ngForm" (ngSubmit)="onSubmitConsultation(consultationForm, modal)">
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label required" for="consultationDate">{{ 'medicalRecord.consultations.columns.date' | transloco }}</label>
+          <app-date-input
+            inputId="consultationDate"
+            name="consultationDate"
+            [(ngModel)]="consultationModel.consultationDate"
+            required
+            [maxDate]="today"
+            #dateField="ngModel"
+            [invalid]="consultationSubmitted() && dateField.invalid"
+          />
+        </div>
+        @if (isAdmin()) {
+        <div class="col-md-6">
+          <label class="form-label required" for="consultationMedecin">
+            {{ 'medicalRecord.consultations.columns.medecin' | transloco }}
+          </label>
+          <select
+            id="consultationMedecin"
+            class="form-control"
+            name="medecinId"
+            [(ngModel)]="consultationModel.medecinId"
+            required
+            #medecinField="ngModel"
+            [class.is-invalid]="consultationSubmitted() && consultationModel.medecinId === null"
+          >
+            <option [ngValue]="null" disabled>{{ 'patient.form.placeholders.medecinSelect' | transloco }}</option>
+            @for (m of medecins(); track m.id) {
+            <option [ngValue]="m.id">{{ m.nom }} {{ m.prenom }}</option>
+            }
+          </select>
+        </div>
+        }
+        <div class="col-12">
+          <label class="form-label required" for="consultationMotif">{{ 'medicalRecord.consultations.columns.motif' | transloco }}</label>
+          <textarea
+            id="consultationMotif"
+            class="form-control"
+            name="motif"
+            rows="2"
+            [(ngModel)]="consultationModel.motif"
+            required
+            #motifField="ngModel"
+            [class.is-invalid]="consultationSubmitted() && motifField.invalid"
+          ></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label required" for="consultationDiagnostic">
+            {{ 'medicalRecord.consultations.columns.diagnostic' | transloco }}
+          </label>
+          <textarea
+            id="consultationDiagnostic"
+            class="form-control"
+            name="diagnostic"
+            rows="2"
+            [(ngModel)]="consultationModel.diagnostic"
+            required
+            #diagnosticField="ngModel"
+            [class.is-invalid]="consultationSubmitted() && diagnosticField.invalid"
+          ></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="consultationNotes">{{ 'medicalRecord.consultations.columns.notes' | transloco }}</label>
+          <textarea id="consultationNotes" class="form-control" name="notes" rows="2" [(ngModel)]="consultationModel.notes"></textarea>
+        </div>
+
+        <div class="col-12">
+          <hr class="my-2" />
+          <h6 class="text-muted mb-2">{{ 'medicalRecord.consultations.vitalsSectionTitle' | transloco }}</h6>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="consultationTAS">{{ 'medicalRecord.consultations.vitals.tensionSystolique' | transloco }}</label>
+          <input
+            type="number"
+            id="consultationTAS"
+            class="form-control"
+            name="tensionArterielleSystolique"
+            min="50"
+            max="300"
+            [(ngModel)]="consultationModel.tensionArterielleSystolique"
+            [placeholder]="'medicalRecord.consultations.vitals.tensionSystoliquePlaceholder' | transloco"
+          />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="consultationTAD">{{ 'medicalRecord.consultations.vitals.tensionDiastolique' | transloco }}</label>
+          <input
+            type="number"
+            id="consultationTAD"
+            class="form-control"
+            name="tensionArterielleDiastolique"
+            min="30"
+            max="200"
+            [(ngModel)]="consultationModel.tensionArterielleDiastolique"
+            [placeholder]="'medicalRecord.consultations.vitals.tensionDiastoliquePlaceholder' | transloco"
+          />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="consultationPouls">{{ 'medicalRecord.consultations.vitals.pouls' | transloco }}</label>
+          <input
+            type="number"
+            id="consultationPouls"
+            class="form-control"
+            name="pouls"
+            min="20"
+            max="300"
+            [(ngModel)]="consultationModel.pouls"
+            [placeholder]="'medicalRecord.consultations.vitals.poulsPlaceholder' | transloco"
+          />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="consultationPoids">{{ 'medicalRecord.consultations.vitals.poids' | transloco }}</label>
+          <input
+            type="number"
+            id="consultationPoids"
+            class="form-control"
+            name="poids"
+            min="0.5"
+            max="500"
+            step="0.1"
+            [(ngModel)]="consultationModel.poids"
+            [placeholder]="'medicalRecord.consultations.vitals.poidsPlaceholder' | transloco"
+          />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="consultationTemperature">{{ 'medicalRecord.consultations.vitals.temperature' | transloco }}</label>
+          <input
+            type="number"
+            id="consultationTemperature"
+            class="form-control"
+            name="temperature"
+            min="30"
+            max="45"
+            step="0.1"
+            [(ngModel)]="consultationModel.temperature"
+            [placeholder]="'medicalRecord.consultations.vitals.temperaturePlaceholder' | transloco"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.cancel' | transloco }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="consultationSubmitting()">
+        @if (consultationSubmitting()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        } {{ 'common.buttons.save' | transloco }}
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #confirmArchiveModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (pendingConsultationAction === 'restore' ? 'medicalRecord.consultations.restoreModal.title' :
+      'medicalRecord.consultations.archiveModal.title') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    {{ (pendingConsultationAction === 'restore' ? 'medicalRecord.consultations.restoreModal.body' :
+    'medicalRecord.consultations.archiveModal.body') | transloco }}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    @if (pendingConsultationAction === 'restore') {
+    <button type="button" class="btn btn-success" (click)="modal.close('confirm')">
+      <i antIcon type="rollback" theme="outline" class="me-1"></i>
+      {{ 'common.buttons.restore' | transloco }}
+    </button>
+    } @else {
+    <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">
+      <i antIcon type="inbox" theme="outline" class="me-1"></i>
+      {{ 'common.buttons.archive' | transloco }}
+    </button>
+    }
+  </div>
+</ng-template>
+
+<ng-template #consultationViewModal let-modal>
+  @if (viewedConsultation(); as c) {
+    <div class="modal-header">
+      <h5 class="modal-title">{{ 'medicalRecord.consultations.viewTitle' | transloco }}</h5>
+      <button
+        type="button"
+        class="btn-close"
+        [attr.aria-label]="'common.buttons.close' | transloco"
+        (click)="modal.dismiss('close')"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.date' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ c.consultationDate | dateFormat }}</p>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.medecin' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ medecinDisplay(c.medecinId) }}</p>
+        </div>
+        <div class="col-12">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.motif' | transloco }}</label>
+          <p class="form-control-plaintext f-w-500 mb-0">{{ c.motif }}</p>
+        </div>
+        <div class="col-12">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.diagnostic' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ c.diagnostic || '—' }}</p>
+        </div>
+        <div class="col-12">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.notes' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ c.notes || '—' }}</p>
+        </div>
+        <div class="col-12">
+          <hr class="my-2" />
+          <h6 class="text-muted mb-2">{{ 'medicalRecord.consultations.vitalsSectionTitle' | transloco }}</h6>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.vitals.tension' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ tensionDisplay(c) }}</p>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.vitals.pouls' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ c.pouls != null ? c.pouls + ' bpm' : '—' }}</p>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.vitals.poids' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ c.poids != null ? c.poids + ' kg' : '—' }}</p>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.vitals.temperature' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ c.temperature != null ? c.temperature + ' °C' : '—' }}</p>
+        </div>
+        @if (c.archived) {
+          <div class="col-12">
+            <span class="badge rounded-pill bg-secondary">{{ 'common.labels.archived' | transloco }}</span>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="modal-footer">
+      @if (canEdit()) {
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          (click)="modal.dismiss('close'); onOpenPrescriptions(c)"
+        >
+          <i antIcon type="medicine-box" theme="outline" class="me-1"></i>
+          {{ 'prescription.modal.tooltip' | transloco }}
+        </button>
+      }
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('close')">
+        {{ 'common.buttons.close' | transloco }}
+      </button>
+    </div>
+  }
+</ng-template>

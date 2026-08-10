@@ -1,0 +1,53 @@
+<div class="profile-avatar-wrapper">
+  <div class="profile-avatar" (click)="onAvatarClick()" role="button" tabindex="0" (keyup.enter)="onAvatarClick()">
+    <img [src]="previewUrl() ?? currentUser()?.photoUrl ?? defaultAvatar" alt="Avatar" class="profile-avatar-img" />
+    <div class="profile-avatar-overlay">
+      <i antIcon theme="outline" type="camera"></i>
+      <span>{{ 'profile.avatar.changePhoto' | transloco }}</span>
+    </div>
+  </div>
+
+  <input #fileInput type="file" class="d-none" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" />
+
+  <div class="profile-avatar-actions">
+    @if (previewUrl()) {
+      <button type="button" class="btn btn-sm btn-primary" [disabled]="uploading()" (click)="confirmUpload()">
+        @if (uploading()) {
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        }
+        {{ 'profile.avatar.confirm' | transloco }}
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="uploading()" (click)="cancelPreview()">
+        {{ 'profile.avatar.cancel' | transloco }}
+      </button>
+    } @else if (currentUser()?.photoUrl) {
+      <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="removing()" (click)="onRemoveClick()">
+        @if (removing()) {
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        }
+        <i antIcon theme="outline" type="delete" class="me-1"></i>
+        {{ 'profile.avatar.removePhoto' | transloco }}
+      </button>
+    }
+  </div>
+
+  @if (clientError()) {
+    <div class="text-danger small mt-2">{{ clientError() }}</div>
+  }
+</div>
+
+<ng-template #removeConfirmModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'profile.avatar.removeModal.title' | transloco }}</h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    {{ 'profile.avatar.removeModal.body' | transloco }}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">{{ 'common.buttons.confirm' | transloco }}</button>
+  </div>
+</ng-template>

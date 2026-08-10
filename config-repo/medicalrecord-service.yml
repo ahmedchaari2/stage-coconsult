@@ -1,0 +1,8 @@
+# medicalrecord-service relies on the shared Feign and circuit-breaker settings from application.yml.
+server:
+  port: 8083
+
+medtrack:
+  acces-log:
+    # Access-log retention is shorter than medical records because it only serves recent traceability.
+    retention-days: 30

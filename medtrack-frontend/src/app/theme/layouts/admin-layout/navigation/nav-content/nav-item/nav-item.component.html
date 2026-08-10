@@ -1,0 +1,41 @@
+@if (item().url && !item().external && !item().hidden) {
+  <li
+    [ngClass]="item().classes!"
+    [routerLinkActive]="['active']"
+    [routerLinkActiveOptions]="{
+      paths: (item().exactMatch ?? false) ? 'exact' : 'subset',
+      queryParams: 'subset',
+      fragment: 'ignored',
+      matrixParams: 'ignored'
+    }"
+  >
+    <a class="nav-link" [target]="item().target ? '_blank' : '_self'" [routerLink]="[item().url]" (click)="closeOtherMenu($event)">
+      @if (item().icon) {
+        <span class="coded-micon">
+          <i antIcon type="{{ item().icon }}" theme="outline"></i>
+        </span>
+      }
+      @if (item().icon) {
+        <span class="coded-mtext">{{ item().translate ? (item().translate! | transloco) : item().title }}</span>
+      } @else {
+        {{ item().translate ? (item().translate! | transloco) : item().title }}
+      }
+    </a>
+  </li>
+}
+@if (item().url && item().external && !item().hidden) {
+  <li [ngClass]="item().classes!">
+    <a [target]="item().target ? '_blank' : '_self'" [href]="item().url">
+      @if (item().icon) {
+        <span class="coded-micon">
+          <i antIcon type="{{ item().icon }}" theme="outline"></i>
+        </span>
+      }
+      @if (item().icon) {
+        <span class="coded-mtext">{{ item().translate ? (item().translate! | transloco) : item().title }}</span>
+      } @else {
+        {{ item().translate ? (item().translate! | transloco) : item().title }}
+      }
+    </a>
+  </li>
+}

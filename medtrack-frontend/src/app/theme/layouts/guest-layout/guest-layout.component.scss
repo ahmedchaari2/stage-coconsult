@@ -1,0 +1,24 @@
+@import '../../../../scss/settings/brand.scss';
+.auth-shell {
+  --auth-card-width: 460px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--bs-primary) 10%, var(--bs-body-bg)) 0%, var(--bs-body-bg) 55%);
+}
+
+.auth-shell-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: var(--auth-card-width);
+}
+
+.auth-brand {
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}

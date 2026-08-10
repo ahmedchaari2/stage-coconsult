@@ -1,0 +1,19 @@
+# prescription-service uses a two-hop call chain, so its first-hop circuit breaker is tuned here.
+server:
+  port: 8085
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        ignore-exceptions:
+          - org.springframework.web.server.ResponseStatusException
+      medicalRecordService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        ignore-exceptions:
+          - org.springframework.web.server.ResponseStatusException

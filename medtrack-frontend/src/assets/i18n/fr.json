@@ -1,0 +1,1180 @@
+{
+  "dashboard": {
+    "title": "Tableau de bord",
+    "loading": "Chargement du tableau de bord...",
+    "noRole": "Aucun tableau de bord disponible pour votre rôle.",
+    "unavailable": "Section momentanément indisponible.",
+    "seeAll": "Voir",
+    "errors": {
+      "forbidden": "Accès refusé au tableau de bord.",
+      "loadFailed": "Erreur lors du chargement du tableau de bord."
+    },
+    "medecin": {
+      "rdvJour": {
+        "title": "Rendez-vous du jour",
+        "total": "aujourd'hui",
+        "empty": "Aucun rendez-vous aujourd'hui.",
+        "prochain": "Prochain"
+      },
+      "consultations": {
+        "title": "Consultations",
+        "ceMois": "Ce mois-ci",
+        "moisPrecedent": "Mois précédent"
+      },
+      "patients": {
+        "title": "Mes patients",
+        "suivis": "Patients suivis",
+        "nouveaux": "nouveaux ce mois"
+      },
+      "traitements": {
+        "title": "Traitements à échéance (7 j)",
+        "empty": "Aucun traitement n'arrive à échéance.",
+        "finLe": "fin le {{date}}",
+        "joursUnit": "j"
+      },
+      "sansDossier": {
+        "title": "Patients sans dossier médical",
+        "empty": "Tous vos patients ont un dossier.",
+        "action": "Créer"
+      }
+    },
+    "admin": {
+      "periode": {
+        "label": "Période",
+        "7j": "7 jours",
+        "30j": "30 jours",
+        "mois": "Mois en cours"
+      },
+      "aujourdhui": {
+        "title": "Aujourd'hui",
+        "aConfirmer": "à confirmer",
+        "annulesAujourdhui": "annulations aujourd'hui",
+        "empty": "Aucun rendez-vous aujourd'hui.",
+        "unavailable": "Vue du jour momentanément indisponible.",
+        "prochainePlage": "Prochaine plage libre : {{heure}}",
+        "disponibilites": "Prochaines disponibilités",
+        "showMore": "Afficher {{count}} autres",
+        "showLess": "Afficher moins"
+      },
+      "activite": {
+        "title": "Activité par médecin",
+        "empty": "Aucune activité sur la période.",
+        "medecin": "Médecin",
+        "rdv": "RDV",
+        "consultations": "Consultations",
+        "prescriptions": "Prescriptions",
+        "viewRow": "Voir le détail de {{nom}} {{prenom}}"
+      },
+      "occupation": {
+        "title": "Taux d'occupation",
+        "label": "Occupation",
+        "detail": "{{occupes}} créneaux occupés sur {{total}} cette semaine",
+        "empty": "Aucun créneau ouvrable cette semaine."
+      },
+      "rdv7": {
+        "title": "RDV des 7 prochains jours",
+        "empty": "Aucun rendez-vous à venir."
+      },
+      "annulations": {
+        "title": "Annulations par semaine",
+        "empty": "Aucune annulation récente."
+      },
+      "patients": {
+        "title": "Patients",
+        "actifs": "Actifs",
+        "archives": "Archivés",
+        "nouveauxParMois": "Nouveaux par mois",
+        "nouveauxEmpty": "Aucun nouveau patient récemment.",
+        "parSexe": "Par sexe",
+        "sexeEmpty": "Aucune donnée de sexe disponible.",
+        "parAge": "Par âge",
+        "ageEmpty": "Aucune donnée d'âge disponible.",
+        "sexe": {
+          "HOMME": "Hommes",
+          "FEMME": "Femmes",
+          "NON_RENSEIGNE": "Non renseigné"
+        }
+      },
+      "qualite": {
+        "title": "Qualité des données",
+        "sansNumeroDossier": "Patients sans n° de dossier",
+        "sansCin": "Patients sans CIN",
+        "sansSpecialite": "Médecins sans spécialité",
+        "sansNumeroOrdre": "Médecins sans n° d'ordre",
+        "dossiersManquants": "Dossiers médicaux manquants"
+      }
+    }
+  },
+  "common": {
+    "loading": "Chargement...",
+    "buttons": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "view": "Voir détail",
+      "confirm": "Confirmer",
+      "retry": "Réessayer",
+      "close": "Fermer",
+      "backToList": "Retour à la liste",
+      "archive": "Archiver",
+      "restore": "Restaurer"
+    },
+    "labels": {
+      "actions": "Actions",
+      "archived": "Archivé",
+      "unassigned": "Non assigné"
+    },
+    "search": {
+      "placeholder": "Rechercher...",
+      "label": "Recherche",
+      "noResults": "Aucun résultat pour \"{{term}}\".",
+      "reset": "Réinitialiser",
+      "clear": "Effacer la recherche"
+    },
+    "filters": {
+      "button": "Filtres",
+      "reset": "Réinitialiser",
+      "apply": "Appliquer",
+      "close": "Fermer",
+      "from": "Du",
+      "to": "Au",
+      "removeFilter": "Retirer ce filtre",
+      "all": "Tous",
+      "dateRangeInvalid": "La date de fin doit être postérieure ou égale à la date de début."
+    },
+    "errors": {
+      "timeout": "Le service met trop de temps à répondre. Veuillez réessayer.",
+      "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
+      "adminRequired": "Accès refusé. Droits administrateur requis.",
+      "invalidData": "Données invalides. Vérifiez le formulaire.",
+      "unexpected": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "modal": {
+      "confirmDiscard": "Des modifications non enregistrées seront perdues. Fermer quand même ?"
+    },
+    "datePicker": {
+      "open": "Ouvrir le calendrier"
+    },
+    "password": {
+      "show": "Afficher le mot de passe",
+      "hide": "Masquer le mot de passe"
+    }
+  },
+  "pagination": {
+    "show": "Afficher :",
+    "perPage": "par page",
+    "of": "sur",
+    "item": "élément",
+    "items": "éléments",
+    "noItems": "0 élément",
+    "page": "Page"
+  },
+  "patient": {
+    "list": {
+      "title": "Liste des patients",
+      "viewRow": "Voir la fiche de {{nom}} {{prenom}}",
+      "addButton": "Nouveau patient",
+      "loading": "Chargement des patients...",
+      "empty": {
+        "title": "Aucun patient trouvé",
+        "text": "La liste des patients est vide."
+      },
+      "columns": {
+        "patient": "Patient",
+        "nom": "Nom",
+        "prenom": "Prénom",
+        "dateNaissance": "Date de naissance",
+        "telephone": "Téléphone",
+        "email": "Email",
+        "medecinReferent": "Médecin référent",
+        "numeroDossier": "N° de dossier"
+      },
+      "archiveModal": {
+        "title": "Archiver ce patient ?",
+        "bodyBefore": "Archiver le patient",
+        "bodyAfter": " ? Il n'apparaîtra plus dans les listes mais ses données médicales sont conservées."
+      },
+      "restoreModal": {
+        "title": "Restaurer ce patient ?",
+        "bodyBefore": "Restaurer le patient",
+        "bodyAfter": " ? Il réapparaîtra dans les listes."
+      },
+      "filters": {
+        "nomLabel": "Nom",
+        "prenomLabel": "Prénom",
+        "numeroDossierLabel": "N° de dossier",
+        "numeroDossierPlaceholder": "Ex : PAT-2026-00059",
+        "telephoneLabel": "Téléphone",
+        "telephonePlaceholder": "Ex : 1500 ou numéro complet",
+        "dateNaissanceFromLabel": "Né(e) après",
+        "dateNaissanceToLabel": "Né(e) avant",
+        "medecinReferentLabel": "Médecin référent",
+        "medecinReferentAll": "Tous les médecins",
+        "includeArchivedLabel": "Afficher les archivés",
+        "chips": {
+          "nom": "Nom",
+          "prenom": "Prénom",
+          "numeroDossier": "N° de dossier",
+          "telephone": "Téléphone",
+          "dateNaissanceFrom": "Né(e) après",
+          "dateNaissanceTo": "Né(e) avant",
+          "medecinReferent": "Médecin référent",
+          "archived": "Archivés",
+          "archivedValue": "Affichés",
+          "sansNumeroDossier": "Sans n° de dossier",
+          "sansCin": "Sans CIN",
+          "oui": "Oui"
+        }
+      }
+    },
+    "detail": {
+      "title": "Détail patient",
+      "sectionTitle": "Informations du patient",
+      "tabs": {
+        "label": "Sections de la fiche patient"
+      },
+      "numeroDossier": "N° de dossier",
+      "viewAccesLog": "Qui a consulté ce dossier ?",
+      "archivedBanner": "Patient archivé le {{date}}",
+      "empty": {
+        "text": "Le patient demandé n'existe pas."
+      },
+      "clinical": {
+        "title": "Synthèse clinique",
+        "age": "Âge",
+        "years": "ans",
+        "allergies": "Allergies",
+        "allergiesNone": "Aucune allergie connue",
+        "noData": "Dossier médical non renseigné."
+      }
+    },
+    "history": {
+      "tab": "Historique",
+      "loading": "Chargement de l'historique...",
+      "truncated": "Historique volumineux : seules les 100 entrées les plus récentes de chaque type sont affichées.",
+      "filters": {
+        "label": "Filtrer par type",
+        "all": "Tout"
+      },
+      "types": {
+        "consultation": "Consultation",
+        "appointment": "Rendez-vous",
+        "prescription": "Prescription"
+      },
+      "detail": {
+        "consultation": "Détail de la consultation",
+        "appointment": "Détail du rendez-vous",
+        "prescription": "Détail de la prescription"
+      },
+      "empty": {
+        "title": "Aucun historique",
+        "text": "Ce patient n'a encore ni consultation, ni rendez-vous, ni prescription.",
+        "filtered": "Aucune entrée de ce type dans l'historique."
+      },
+      "errors": {
+        "forbidden": "Accès refusé à l'historique de ce patient.",
+        "loadFailed": "Erreur lors du chargement de l'historique.",
+        "consultationsFailed": "Consultations indisponibles.",
+        "appointmentsFailed": "Rendez-vous indisponibles.",
+        "prescriptionsFailed": "Prescriptions indisponibles.",
+        "partial": "Certaines données n'ont pas pu être chargées."
+      }
+    },
+    "aiChat": {
+      "title": "Assistant IA",
+      "subtitle": "Répond à partir du dossier de ce patient",
+      "close": "Fermer",
+      "placeholder": "Posez une question sur ce patient...",
+      "send": "Envoyer",
+      "empty": "Posez une question sur l'historique, les allergies ou les traitements de ce patient.",
+      "typing": "L'assistant réfléchit...",
+      "suggestions": {
+        "summary": "Résume l'historique de ce patient",
+        "summaryLabel": "Résumé de l'historique",
+        "allergiesTreatment": "Y a-t-il un traitement à surveiller vu ses allergies ?",
+        "allergiesTreatmentLabel": "Traitement vs allergies",
+        "activePrescriptions": "Quelles sont ses prescriptions actives ?",
+        "activePrescriptionsLabel": "Prescriptions actives",
+        "lastDiagnostic": "Quel est le diagnostic de sa dernière consultation ?",
+        "lastDiagnosticLabel": "Dernier diagnostic",
+        "nextAppointment": "Quand est son prochain rendez-vous ?",
+        "nextAppointmentLabel": "Prochain rendez-vous"
+      },
+      "errors": {
+        "unavailable": "Assistant indisponible, réessayez plus tard",
+        "forbidden": "Vous n'êtes pas autorisé à consulter l'assistant pour ce patient.",
+        "generic": "Une erreur est survenue, réessayez plus tard."
+      }
+    },
+    "form": {
+      "createTitle": "Nouveau patient",
+      "editTitle": "Modifier le patient",
+      "loading": "Chargement du patient...",
+      "labels": {
+        "nom": "Nom",
+        "prenom": "Prénom",
+        "dateNaissance": "Date de naissance",
+        "telephone": "Téléphone",
+        "email": "Email",
+        "medecinReferent": "Médecin référent",
+        "adresse": "Adresse",
+        "sexe": "Sexe",
+        "cin": "CIN",
+        "numeroAssurance": "Numéro d'assurance"
+      },
+      "placeholders": {
+        "nom": "Entrez le nom",
+        "prenom": "Entrez le prénom",
+        "telephone": "Ex: 26 000 000",
+        "email": "patient@example.com",
+        "medecinSelect": "Sélectionnez un médecin",
+        "medecinNone": "Aucun",
+        "adresse": "Entrez l'adresse complète",
+        "sexeNone": "Non renseigné",
+        "cin": "Ex : 12345678",
+        "numeroAssurance": "Ex : ASS-123456"
+      },
+      "sexeValues": {
+        "HOMME": "Homme",
+        "FEMME": "Femme"
+      },
+      "emergencyContact": {
+        "title": "Contact d'urgence",
+        "nom": "Nom du contact",
+        "nomPlaceholder": "Nom et prénom",
+        "telephone": "Téléphone du contact",
+        "telephonePlaceholder": "Ex: 26 000 000"
+      },
+      "medecinsLoading": "Chargement des médecins...",
+      "submitCreate": "Créer",
+      "submitEdit": "Modifier",
+      "submitting": "Enregistrement...",
+      "errors": {
+        "nomRequired": "Le nom est requis.",
+        "prenomRequired": "Le prénom est requis.",
+        "dateNaissanceRequired": "La date de naissance est requise.",
+        "dateNaissanceFuture": "La date de naissance ne peut pas être dans le futur.",
+        "telephoneRequired": "Le téléphone est requis.",
+        "telephoneInvalid": "Format de téléphone invalide.",
+        "emailRequired": "L'email est requis.",
+        "emailInvalid": "Format d'email invalide.",
+        "adresseRequired": "L'adresse est requise."
+      }
+    },
+    "errors": {
+      "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
+      "forbidden": "Accès refusé. Droits administrateur requis.",
+      "loadFailed": "Erreur lors du chargement des patients.",
+      "notFound": "Patient introuvable.",
+      "idMissing": "Identifiant patient manquant.",
+      "loadOneFailed": "Erreur lors du chargement du patient.",
+      "createSuccess": "Patient créé avec succès.",
+      "createFailed": "Erreur lors de la création du patient.",
+      "updateSuccess": "Patient modifié avec succès.",
+      "archiveForbidden": "Archivage refusé. Droits administrateur requis.",
+      "restoreForbidden": "Restauration refusée. Droits administrateur requis.",
+      "archiveFailed": "Erreur lors de l'archivage.",
+      "restoreFailed": "Erreur lors de la restauration."
+    }
+  },
+  "appointment": {
+    "view": {
+      "title": "Détail du rendez-vous"
+    },
+    "list": {
+      "title": "Rendez-vous",
+      "viewPatientRow": "Voir le patient {{nom}} {{prenom}}",
+      "viewToggle": {
+        "label": "Vue",
+        "list": "Liste",
+        "calendar": "Calendrier"
+      },
+      "filters": {
+        "all": "Tous les statuts",
+        "statutLabel": "Statut",
+        "dateFromLabel": "Du",
+        "dateToLabel": "Au",
+        "medecinLabel": "Médecin",
+        "medecinAll": "Tous les médecins",
+        "searchPlaceholder": "Rechercher par patient ou motif...",
+        "chips": {
+          "statut": "Statut",
+          "dateFrom": "Du",
+          "dateTo": "Au",
+          "medecin": "Médecin"
+        }
+      },
+      "addButton": "Nouveau rendez-vous",
+      "loading": "Chargement des rendez-vous...",
+      "empty": {
+        "title": "Aucun rendez-vous trouvé",
+        "text": "La liste des rendez-vous est vide."
+      },
+      "columns": {
+        "patient": "Patient",
+        "medecin": "Médecin",
+        "dateHeure": "Date et heure",
+        "motif": "Motif",
+        "statut": "Statut",
+        "notes": "Notes"
+      },
+      "deleteModal": {
+        "title": "Confirmer la suppression",
+        "body": "Êtes-vous sûr de vouloir supprimer ce rendez-vous ? Cette action est irréversible."
+      },
+      "quickActions": {
+        "confirm": "Confirmer",
+        "cancel": "Annuler",
+        "honor": "Marquer honoré",
+        "notesEmpty": "Aucune note",
+        "startConsultation": "Démarrer la consultation",
+        "viewConsultation": "Voir la consultation",
+        "noConsultation": "Aucune consultation enregistrée pour ce rendez-vous"
+      }
+    },
+    "statut": {
+      "PLANIFIE": "Planifié",
+      "CONFIRME": "Confirmé",
+      "ANNULE": "Annulé",
+      "HONORE": "Honoré"
+    },
+    "calendar": {
+      "previous": "Mois précédent",
+      "next": "Mois suivant",
+      "today": "Aujourd'hui",
+      "more": "+{{count}} autres",
+      "weekdays": {
+        "mon": "Lun",
+        "tue": "Mar",
+        "wed": "Mer",
+        "thu": "Jeu",
+        "fri": "Ven",
+        "sat": "Sam",
+        "sun": "Dim"
+      }
+    },
+    "form": {
+      "createTitle": "Nouveau rendez-vous",
+      "editTitle": "Modifier le rendez-vous",
+      "labels": {
+        "patient": "Patient",
+        "medecin": "Médecin",
+        "date": "Date",
+        "creneau": "Créneau",
+        "motif": "Motif",
+        "statut": "Statut",
+        "notes": "Notes"
+      },
+      "placeholders": {
+        "patientSearch": "Rechercher un patient par nom ou prénom..."
+      },
+      "creneaux": {
+        "selectMedecinDate": "Choisissez un médecin et une date pour voir les créneaux disponibles.",
+        "loading": "Chargement des créneaux...",
+        "loadFailed": "Impossible de charger les créneaux disponibles.",
+        "empty": "Aucun créneau disponible ce jour-là. Choisissez une autre date."
+      },
+      "errors": {
+        "patientRequired": "Veuillez sélectionner un patient.",
+        "creneauRequired": "Veuillez choisir un créneau.",
+        "sundayUnavailable": "Les rendez-vous ne peuvent pas être planifiés le dimanche."
+      },
+      "statutLockedCreate": "Un nouveau rendez-vous est toujours créé avec le statut \"Planifié\".",
+      "submitting": "Enregistrement..."
+    },
+    "errors": {
+      "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
+      "forbidden": "Accès refusé.",
+      "loadFailed": "Erreur lors du chargement des rendez-vous.",
+      "actionForbidden": "Action refusée.",
+      "invalidData": "Données invalides. Vérifiez le formulaire.",
+      "slotTaken": "Ce créneau vient d'être réservé. Choisissez-en un autre.",
+      "notFound": "Rendez-vous introuvable.",
+      "createFailed": "Erreur lors de la création du rendez-vous.",
+      "updateFailed": "Erreur lors de la mise à jour du rendez-vous.",
+      "deleteForbidden": "Suppression refusée.",
+      "deleteFailed": "Erreur lors de la suppression du rendez-vous."
+    },
+    "success": {
+      "created": "Rendez-vous créé avec succès.",
+      "updated": "Rendez-vous modifié avec succès.",
+      "deleted": "Rendez-vous supprimé avec succès."
+    }
+  },
+  "medecin": {
+    "gestion": {
+      "listTitle": "Médecins",
+      "tabs": {
+        "label": "Sections de gestion des médecins"
+      },
+      "loading": "Chargement des médecins...",
+      "empty": {
+        "title": "Aucun médecin trouvé",
+        "text": "La liste des médecins est vide."
+      },
+      "columns": {
+        "medecin": "Médecin",
+        "nom": "Nom",
+        "prenom": "Prénom",
+        "email": "Email",
+        "specialite": "Spécialité",
+        "numeroOrdre": "N° d'ordre",
+        "statut": "Statut"
+      },
+      "profilIncomplet": "Profil incomplet : l'ordonnance PDF a besoin de la spécialité et du n° d'ordre.",
+      "status": {
+        "actif": "Actif",
+        "inactif": "Inactif"
+      },
+      "confirmModal": {
+        "title": "Confirmer l'action",
+        "bodyBefore": "Êtes-vous sûr de vouloir",
+        "bodyMiddle": "le compte de"
+      },
+      "filters": {
+        "nomLabel": "Nom",
+        "prenomLabel": "Prénom",
+        "specialiteLabel": "Spécialité",
+        "numeroOrdreLabel": "N° d'ordre",
+        "numeroOrdrePlaceholder": "Ex : ORD-12345",
+        "statutLabel": "Statut",
+        "statutAll": "Tous",
+        "chips": {
+          "nom": "Nom",
+          "prenom": "Prénom",
+          "specialite": "Spécialité",
+          "numeroOrdre": "N° d'ordre",
+          "statut": "Statut",
+          "sansSpecialite": "Sans spécialité",
+          "sansNumeroOrdre": "Sans n° d'ordre",
+          "oui": "Oui"
+        }
+      }
+    },
+    "actions": {
+      "deactivate": "Désactiver",
+      "reactivate": "Réactiver"
+    },
+    "detail": {
+      "title": "Détail médecin",
+      "sectionTitle": "Informations du médecin",
+      "identitySection": "Identité",
+      "professionalSection": "Informations professionnelles",
+      "contactSection": "Coordonnées",
+      "accountSection": "Compte",
+      "createdAt": "Compte créé le",
+      "empty": {
+        "text": "Le médecin demandé n'existe pas."
+      }
+    },
+    "edit": {
+      "title": "Modifier le médecin",
+      "loading": "Chargement du médecin...",
+      "submitting": "Enregistrement...",
+      "labels": {
+        "nom": "Nom",
+        "prenom": "Prénom",
+        "email": "Email",
+        "specialite": "Spécialité",
+        "numeroOrdre": "Numéro d'ordre",
+        "telephone": "Téléphone professionnel"
+      },
+      "placeholders": {
+        "nom": "Nom",
+        "prenom": "Prénom",
+        "email": "medecin@example.com",
+        "specialite": "Ex : Cardiologue",
+        "numeroOrdre": "Ex : ORD-12345",
+        "telephone": "Ex : +216 20 123 456"
+      },
+      "errors": {
+        "nomRequired": "Le nom est requis.",
+        "prenomRequired": "Le prénom est requis.",
+        "emailRequired": "L'email est requis.",
+        "emailInvalid": "Format d'email invalide.",
+        "telephoneInvalid": "Saisissez un numéro de téléphone valide."
+      }
+    },
+    "errors": {
+      "notFound": "Médecin introuvable.",
+      "idMissing": "Identifiant médecin manquant.",
+      "loadOneFailed": "Erreur lors du chargement du médecin.",
+      "loadListFailed": "Erreur lors du chargement des médecins.",
+      "updateSuccess": "Médecin modifié avec succès.",
+      "updateForbidden": "Modification refusée. Droits administrateur requis.",
+      "updateFailed": "Erreur lors de la modification du médecin.",
+      "actionForbidden": "Action refusée. Droits administrateur requis.",
+      "invitationSuccess": "Invitation envoyée avec succès.",
+      "invitationFailed": "Erreur lors de l'envoi de l'invitation. Veuillez réessayer.",
+      "toggleFailed": "Erreur lors de la mise à jour du compte.",
+      "loadInvitationsFailed": "Erreur lors du chargement des invitations."
+    }
+  },
+  "invitation": {
+    "form": {
+      "title": "Inviter un médecin",
+      "emailLabel": "Email du médecin*",
+      "emailPlaceholder": "exemple@medecin.com",
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Veuillez saisir un email valide",
+      "submit": "Inviter"
+    },
+    "activate": {
+      "errors": {
+        "invalidLink": "Lien d'invitation invalide.",
+        "validateFailed": "Impossible de valider cette invitation. Veuillez réessayer.",
+        "activateFailed": "Une erreur est survenue lors de l'activation du compte.",
+        "expiredAction": "Contactez votre administrateur pour recevoir une nouvelle invitation."
+      }
+    },
+    "list": {
+      "title": "Invitations",
+      "loading": "Chargement des invitations...",
+      "resendTooltip": "Renvoyer l'invitation",
+      "empty": {
+        "title": "Aucune invitation",
+        "text": "Aucune invitation envoyée pour le moment."
+      },
+      "columns": {
+        "email": "Email",
+        "statut": "Statut",
+        "expiration": "Expire le",
+        "invitedBy": "Invité par"
+      }
+    },
+    "status": {
+      "pending": "En attente",
+      "expired": "Expirée",
+      "accepted": "Acceptée",
+      "revoked": "Révoquée"
+    },
+    "actions": {
+      "revoke": "Révoquer"
+    },
+    "confirmRevoke": {
+      "title": "Révoquer l'invitation ?",
+      "body": "Le lien d'activation ne fonctionnera plus pour"
+    },
+    "errors": {
+      "revokeSuccess": "Invitation révoquée avec succès.",
+      "revokeFailed": "Erreur lors de la révocation de l'invitation."
+    }
+  },
+  "profile": {
+    "edit": {
+      "title": "Modifier le profil",
+      "tabs": {
+        "label": "Sections du profil",
+        "profile": "Informations du profil",
+        "security": "Sécurité"
+      },
+      "labels": {
+        "prenom": "Prénom",
+        "nom": "Nom",
+        "email": "Email",
+        "telephone": "Téléphone professionnel",
+        "specialite": "Spécialité",
+        "numeroOrdre": "Numéro d'ordre"
+      },
+      "placeholders": {
+        "prenom": "Votre prénom",
+        "nom": "Votre nom",
+        "email": "votre@email.com",
+        "telephone": "Ex : +216 20 123 456",
+        "specialite": "Ex : Cardiologie",
+        "numeroOrdre": "Ex : OM-2020-0142"
+      },
+      "success": "Profil mis à jour avec succès.",
+      "emailTaken": "Cet email est déjà utilisé par un autre compte.",
+      "unauthorized": "Session expirée. Veuillez vous reconnecter.",
+      "error": "Erreur lors de la mise à jour du profil."
+    },
+    "view": {
+      "title": "Mon Profil",
+      "labels": {
+        "role": "Rôle",
+        "createdAt": "Compte créé le",
+        "status": "Statut du compte"
+      },
+      "sections": {
+        "identity": "Identité",
+        "contact": "Coordonnées",
+        "professional": "Informations professionnelles",
+        "account": "Compte"
+      },
+      "roles": {
+        "admin": "Administrateur",
+        "medecin": "Médecin"
+      },
+      "incompleteProfessionalProfile": "Complétez votre spécialité et votre numéro d'ordre pour garantir des documents médicaux complets.",
+      "editButton": "Modifier le profil",
+      "changePasswordButton": "Changer le mot de passe",
+      "noUser": "Aucun utilisateur connecté.",
+      "reconnect": "Se reconnecter"
+    },
+    "security": {
+      "title": "Sécurité",
+      "currentPasswordLabel": "Mot de passe actuel",
+      "currentPasswordPlaceholder": "Votre mot de passe actuel",
+      "currentPasswordRequired": "Le mot de passe actuel est requis",
+      "currentPasswordInvalid": "Mot de passe actuel incorrect.",
+      "newPasswordLabel": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "Mot de passe (min. 8 caractères)",
+      "newPasswordRequired": "Le nouveau mot de passe est requis",
+      "newPasswordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+      "confirmPasswordLabel": "Confirmer le nouveau mot de passe",
+      "confirmPasswordPlaceholder": "Ressaisir le nouveau mot de passe",
+      "confirmPasswordRequired": "La confirmation est requise",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "submit": "Changer le mot de passe",
+      "success": "Mot de passe modifié avec succès.",
+      "successSessionsRevoked": "Mot de passe modifié avec succès. Vos autres sessions actives ont été déconnectées par sécurité.",
+      "error": "Erreur lors du changement de mot de passe."
+    },
+    "avatar": {
+      "changePhoto": "Changer la photo",
+      "removePhoto": "Retirer la photo",
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "invalidType": "Format non supporté. Utilisez une image JPEG, PNG ou WEBP.",
+      "invalidSize": "L'image ne doit pas dépasser 5 Mo.",
+      "removeModal": {
+        "title": "Retirer la photo de profil ?",
+        "body": "Votre photo de profil sera retirée. Vous pourrez en ajouter une nouvelle à tout moment."
+      },
+      "uploadSuccess": "Photo de profil mise à jour.",
+      "removeSuccess": "Photo de profil retirée.",
+      "uploadError": "Erreur lors de l'envoi de la photo.",
+      "removeError": "Erreur lors de la suppression de la photo."
+    },
+    "validation": {
+      "required": "Ce champ est requis.",
+      "email": "Format d'email invalide.",
+      "invalid": "Valeur invalide.",
+      "minLength": "Minimum {{count}} caractères.",
+      "maxLength": "Maximum {{count}} caractères.",
+      "telephone": "Saisissez un numéro de téléphone valide."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "emailPlaceholder": "Adresse email",
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Saisissez une adresse email valide",
+      "passwordPlaceholder": "Mot de passe (min. 8 caractères)",
+      "passwordRequired": "Le mot de passe est requis",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+      "submit": "Se connecter",
+      "activatedMessage": "Votre compte a été activé avec succès. Vous pouvez vous connecter.",
+      "accessDenied": "Connexion refusée. Veuillez réessayer.",
+      "forgotPasswordLink": "Mot de passe oublié ?",
+      "passwordResetSuccess": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez vous connecter."
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "instructions": "Saisissez votre adresse email : si un compte existe, vous recevrez un lien de réinitialisation.",
+      "emailLabel": "Adresse email",
+      "emailPlaceholder": "Adresse email",
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Saisissez une adresse email valide",
+      "submit": "Envoyer le lien",
+      "backToLogin": "Retour à la connexion",
+      "sentTitle": "Email envoyé",
+      "sentMessage": "Si un compte est associé à cette adresse, un email contenant un lien de réinitialisation vient de vous être envoyé.",
+      "error": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "passwordLabel": "Nouveau mot de passe*",
+      "passwordPlaceholder": "Mot de passe (min. 8 caractères)",
+      "passwordRequired": "Le mot de passe est requis",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+      "confirmPasswordLabel": "Confirmer le mot de passe*",
+      "confirmPasswordPlaceholder": "Ressaisir le mot de passe",
+      "confirmPasswordRequired": "La confirmation est requise",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "submit": "Réinitialiser le mot de passe",
+      "backToLogin": "Retour à la connexion",
+      "invalidLinkTitle": "Lien invalide",
+      "invalidLinkMessage": "Ce lien de réinitialisation est invalide ou incomplet. Veuillez refaire une demande.",
+      "error": "Ce lien de réinitialisation est invalide ou a expiré. Veuillez refaire une demande."
+    },
+    "activate": {
+      "loading": "Validation de votre invitation...",
+      "invalidTitle": "Invitation invalide",
+      "backToLogin": "Retour à la connexion",
+      "title": "Activer mon compte",
+      "alreadyRegistered": "Déjà inscrit ?",
+      "emailLabel": "Email",
+      "nomLabel": "Nom*",
+      "nomPlaceholder": "Nom",
+      "nomRequired": "Le nom est requis",
+      "prenomLabel": "Prénom*",
+      "prenomPlaceholder": "Prénom",
+      "prenomRequired": "Le prénom est requis",
+      "passwordLabel": "Mot de passe*",
+      "passwordPlaceholder": "Mot de passe (min. 8 caractères)",
+      "passwordRequired": "Le mot de passe est requis",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+      "confirmPasswordLabel": "Confirmer le mot de passe*",
+      "confirmPasswordPlaceholder": "Ressaisir le mot de passe",
+      "confirmPasswordRequired": "La confirmation est requise",
+      "confirmPasswordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "submit": "Activer mon compte"
+    }
+  },
+  "medicalRecord": {
+    "loading": "Chargement du dossier médical...",
+    "empty": {
+      "title": "Aucun dossier médical pour ce patient."
+    },
+    "createButton": "Créer le dossier",
+    "sectionTitle": "Dossier médical",
+    "navigation": {
+      "label": "Sections du dossier médical",
+      "summary": "Synthèse médicale"
+    },
+    "fields": {
+      "groupeSanguin": "Groupe sanguin",
+      "allergies": "Allergies",
+      "antecedents": "Antécédents",
+      "traitementsChroniques": "Traitements chroniques",
+      "antecedentsFamiliaux": "Antécédents familiaux",
+      "vaccinations": "Vaccinations"
+    },
+    "consultations": {
+      "title": "Consultations",
+      "addButton": "Ajouter une consultation",
+      "loading": "Chargement des consultations...",
+      "empty": "Aucune consultation enregistrée.",
+      "filters": {
+        "showArchivedLabel": "Afficher les archivées",
+        "searchPlaceholder": "Rechercher (motif, diagnostic)"
+      },
+      "columns": {
+        "date": "Date",
+        "motif": "Motif",
+        "diagnostic": "Diagnostic",
+        "notes": "Notes",
+        "vitals": "Constantes vitales",
+        "medecin": "Médecin"
+      },
+      "vitalsSectionTitle": "Constantes vitales",
+      "vitals": {
+        "tension": "Tension artérielle",
+        "tensionSystolique": "Tension systolique",
+        "tensionSystoliquePlaceholder": "Ex : 120 (mmHg)",
+        "tensionDiastolique": "Tension diastolique",
+        "tensionDiastoliquePlaceholder": "Ex : 80 (mmHg)",
+        "pouls": "Pouls",
+        "poulsPlaceholder": "Ex : 72 (bpm)",
+        "poids": "Poids",
+        "poidsPlaceholder": "Ex : 70 (kg)",
+        "temperature": "Température",
+        "temperaturePlaceholder": "Ex : 37.2 (°C)"
+      },
+      "addTitle": "Ajouter une consultation",
+      "editTitle": "Modifier la consultation",
+      "viewTitle": "Détail de la consultation",
+      "viewAppointment": "Voir le rendez-vous",
+      "archiveModal": {
+        "title": "Confirmer l'archivage",
+        "body": "Archiver cette consultation ? Elle n'apparaîtra plus dans le dossier actif mais restera conservée dans l'historique."
+      },
+      "restoreModal": {
+        "title": "Confirmer la restauration",
+        "body": "Restaurer cette consultation ? Elle réapparaîtra dans le dossier actif."
+      }
+    },
+    "traceability": {
+      "createdBy": "Créé par {{user}} le {{date}}",
+      "modifiedBy": "Modifié par {{user}} le {{date}}"
+    },
+    "errors": {
+      "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
+      "forbidden": "Accès refusé.",
+      "loadFailed": "Erreur lors du chargement du dossier médical.",
+      "actionForbidden": "Action refusée.",
+      "createFailed": "Erreur lors de la création du dossier médical.",
+      "updateForbidden": "Modification refusée.",
+      "updateFailed": "Erreur lors de la mise à jour du dossier médical.",
+      "consultationsLoadFailed": "Erreur lors du chargement des consultations.",
+      "requestedConsultationUnavailable": "La consultation demandée n'a pas pu être affichée.",
+      "invalidData": "Données invalides. Vérifiez le formulaire.",
+      "consultationSaveFailed": "Erreur lors de l'enregistrement de la consultation.",
+      "archiveForbidden": "Archivage refusé.",
+      "archiveFailed": "Erreur lors de l'archivage.",
+      "restoreForbidden": "Restauration refusée.",
+      "restoreFailed": "Erreur lors de la restauration."
+    },
+    "success": {
+      "recordCreated": "Dossier médical créé avec succès.",
+      "recordUpdated": "Dossier médical mis à jour avec succès.",
+      "consultationAdded": "Consultation ajoutée avec succès.",
+      "consultationUpdated": "Consultation modifiée avec succès.",
+      "consultationArchived": "Consultation archivée avec succès.",
+      "consultationRestored": "Consultation restaurée avec succès.",
+      "appointmentMarkedHonored": "Rendez-vous marqué comme honoré."
+    },
+    "form": {
+      "createTitle": "Créer le dossier médical",
+      "editTitle": "Modifier le dossier médical",
+      "groupeSanguinPlaceholder": "Sélectionnez un groupe sanguin",
+      "groupeSanguinRequired": "Le groupe sanguin est requis.",
+      "allergiesPlaceholder": "Aucune",
+      "allergiesRequired": "Les allergies sont requises (indiquez \"Aucune\" si le patient n'en a pas).",
+      "antecedentsPlaceholder": "Aucun",
+      "antecedentsRequired": "Les antécédents sont requis (indiquez \"Aucun\" si absents).",
+      "traitementsChroniquesPlaceholder": "Aucun",
+      "antecedentsFamiliauxPlaceholder": "Aucun",
+      "vaccinationsPlaceholder": "Aucune"
+    }
+  },
+  "prescription": {
+    "view": {
+      "title": "Détail de la prescription"
+    },
+    "fields": {
+      "medicament": "Médicament",
+      "posologie": "Posologie",
+      "dureeJours": "Durée (jours)",
+      "instructions": "Instructions",
+      "jours": "jours",
+      "renouvelable": "Renouvelable"
+    },
+    "badges": {
+      "renouvelable": "Renouvelable"
+    },
+    "placeholders": {
+      "medicament": "Ex : Amoxicilline 500mg",
+      "posologie": "Ex : 1 comprimé 3 fois par jour",
+      "dureeJours": "Ex : 7",
+      "instructions": "Ex : À prendre pendant les repas"
+    },
+    "errors": {
+      "medicamentRequired": "Le médicament est requis.",
+      "posologieRequired": "La posologie est requise.",
+      "dureeJoursInvalid": "La durée doit être un nombre de jours positif.",
+      "loadFailed": "Erreur lors du chargement des prescriptions.",
+      "actionForbidden": "Action refusée.",
+      "invalidData": "Données invalides. Vérifiez le formulaire.",
+      "createFailed": "Erreur lors de l'ajout de la prescription.",
+      "updateFailed": "Erreur lors de la modification de la prescription.",
+      "archiveForbidden": "Archivage refusé.",
+      "archiveFailed": "Erreur lors de l'archivage de la prescription.",
+      "restoreForbidden": "Restauration refusée.",
+      "restoreFailed": "Erreur lors de la restauration de la prescription.",
+      "ordonnanceFailed": "Erreur lors de la génération de l'ordonnance."
+    },
+    "ordonnance": {
+      "button": "Imprimer l'ordonnance",
+      "tooltip": "Télécharger l'ordonnance de la consultation au format PDF.",
+      "emptyTooltip": "Aucune prescription à imprimer pour cette consultation.",
+      "archivedTooltip": "Une prescription archivée ne figure pas sur l'ordonnance."
+    },
+    "success": {
+      "created": "Prescription ajoutée avec succès.",
+      "updated": "Prescription modifiée avec succès.",
+      "archived": "Prescription archivée avec succès.",
+      "restored": "Prescription restaurée avec succès."
+    },
+    "modal": {
+      "title": "Prescriptions",
+      "tooltip": "Prescriptions",
+      "showArchivedLabel": "Afficher les archivées",
+      "addButton": "Ajouter une prescription",
+      "empty": "Aucune prescription pour cette consultation."
+    },
+    "editModal": {
+      "title": "Modifier la prescription",
+      "createTitle": "Nouvelle prescription"
+    },
+    "archiveModal": {
+      "title": "Archiver cette prescription ?",
+      "body": "Cette prescription n'apparaîtra plus dans la liste, mais reste conservée dans l'historique."
+    },
+    "restoreModal": {
+      "title": "Restaurer cette prescription ?",
+      "body": "Cette prescription réapparaîtra dans la liste."
+    },
+    "list": {
+      "title": "Prescriptions",
+      "loading": "Chargement des prescriptions...",
+      "viewPatientRow": "Voir le patient {{nom}} {{prenom}}",
+      "viewMedecinRow": "Voir le médecin {{nom}} {{prenom}}",
+      "filters": {
+        "searchPlaceholder": "Rechercher par médicament ou patient...",
+        "patientLabel": "Patient",
+        "patientPlaceholder": "Rechercher un patient par nom ou prénom...",
+        "medecinLabel": "Médecin",
+        "medecinAll": "Tous les médecins",
+        "dateFromLabel": "Consultation du",
+        "dateToLabel": "Consultation au",
+        "showArchivedLabel": "Afficher les archivées",
+        "statutCalculeLabel": "Statut",
+        "chips": {
+          "patient": "Patient",
+          "medecin": "Médecin",
+          "dateFrom": "Du",
+          "dateTo": "Au",
+          "archived": "Archivées",
+          "archivedValue": "Affichées",
+          "statutCalcule": "Statut"
+        }
+      },
+      "columns": {
+        "patient": "Patient",
+        "medecin": "Médecin",
+        "consultationDate": "Date de consultation",
+        "statutCalcule": "Statut"
+      },
+      "joursUnit": "j",
+      "statut": {
+        "active": "Active",
+        "expiree": "Expirée"
+      },
+      "empty": {
+        "title": "Aucune prescription trouvée",
+        "text": "La liste des prescriptions est vide."
+      },
+      "errors": {
+        "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
+        "forbidden": "Accès refusé.",
+        "loadFailed": "Erreur lors du chargement des prescriptions."
+      },
+      "addButton": "Nouvelle prescription",
+      "renewTooltip": "Renouveler cette prescription"
+    },
+    "createWizard": {
+      "title": "Nouvelle prescription",
+      "renewTitle": "Renouveler la prescription",
+      "stepPatient": {
+        "label": "Pour quel patient ?",
+        "searchPlaceholder": "Rechercher un patient par nom ou prénom..."
+      },
+      "stepConsultation": {
+        "label": "Rattacher à la consultation de",
+        "back": "Changer de patient",
+        "loadError": "Erreur lors du chargement des consultations.",
+        "empty": {
+          "title": "Aucune consultation",
+          "text": "Ce patient n'a pas encore de consultation. Il faut en créer une avant de pouvoir ajouter une prescription.",
+          "action": "Créer une consultation"
+        }
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification.",
+    "loadMore": "Charger plus",
+    "appointment": {
+      "NOUVEAU_RENDEZ_VOUS": "Nouveau rendez-vous avec {{patient}} le {{date}}.",
+      "CHANGEMENT_STATUT": "Rendez-vous avec {{patient}} : statut changé en {{statut}}.",
+      "RAPPEL": "Rappel : rendez-vous avec {{patient}} le {{date}}.",
+      "fallbackPatient": "un patient",
+      "fallbackMedecin": "un médecin",
+      "fallbackDate": "date à confirmer",
+      "fallbackStatut": "un nouveau statut"
+    },
+    "relativeTime": {
+      "now": "à l'instant",
+      "minutes": "il y a {{count}} min",
+      "hours": "il y a {{count}} h",
+      "days": "il y a {{count}} j"
+    }
+  },
+  "accesLog": {
+    "list": {
+      "title": "Journal d'accès",
+      "searchPlaceholder": "Filtrer par ressource ou action...",
+      "loading": "Chargement du journal d'accès...",
+      "empty": {
+        "title": "Aucun événement d'audit enregistré",
+        "text": "Aucune action d'audit ne correspond à ces filtres."
+      },
+      "columns": {
+        "dateHeure": "Date et heure",
+        "utilisateur": "Utilisateur",
+        "typeRessource": "Type",
+        "action": "Action",
+        "patient": "Patient",
+        "target": "Cible"
+      }
+    },
+    "filters": {
+      "patientLabel": "Patient",
+      "patientPlaceholder": "Rechercher un patient par nom ou prénom...",
+      "utilisateurLabel": "Utilisateur",
+      "utilisateurAll": "Tous les utilisateurs",
+      "typeRessourceLabel": "Type de ressource",
+      "actionLabel": "Action",
+      "chips": {
+        "utilisateur": "Utilisateur",
+        "patient": "Patient",
+        "typeRessource": "Type",
+        "action": "Action"
+      }
+    },
+    "typeRessource": {
+      "PATIENT": "Patient",
+      "MEDECIN": "Médecin",
+      "RENDEZ_VOUS": "Rendez-vous",
+      "DOSSIER_MEDICAL": "Dossier médical",
+      "CONSULTATION": "Consultation",
+      "PRESCRIPTION": "Prescription"
+    },
+    "action": {
+      "VIEW": "Lecture",
+      "CREATE": "Création",
+      "UPDATE": "Modification",
+      "ARCHIVE": "Archivage",
+      "RESTORE": "Restauration",
+      "DELETE": "Suppression",
+      "PRINT": "Impression",
+      "RENEW": "Renouvellement",
+      "STATUS_CHANGE": "Changement de statut"
+    },
+    "errors": {
+      "loadFailed": "Erreur lors du chargement du journal d'accès."
+    }
+  },
+  "nav": {
+    "breadcrumbHome": "Accueil",
+    "actions": {
+      "toggleSidebar": "Réduire/agrandir le menu",
+      "toggleMobileMenu": "Ouvrir/fermer le menu"
+    },
+    "dashboard": {
+      "group": "Tableau de bord",
+      "default": "Vue d'ensemble"
+    },
+    "patients": {
+      "list": "Patients"
+    },
+    "medecins": {
+      "group": "Médecins",
+      "list": "Médecins"
+    },
+    "accesLog": {
+      "list": "Journal d'accès"
+    },
+    "prescriptions": {
+      "list": "Prescriptions"
+    },
+    "appointments": {
+      "list": "Rendez-vous"
+    },
+    "profile": {
+      "tab": "Profil",
+      "editProfile": "Modifier le profil",
+      "viewProfile": "Voir le profil",
+      "logout": "Déconnexion"
+    }
+  }
+}

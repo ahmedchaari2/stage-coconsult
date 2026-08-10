@@ -1,0 +1,32 @@
+.badge {
+  --bs-badge-font-size: 0.8125rem;
+  --bs-badge-font-weight: 500;
+  --bs-badge-padding-x: 0.625em;
+  --bs-badge-padding-y: 0.4em;
+  line-height: 1;
+  vertical-align: middle;
+
+  @each $color, $value in $theme-colors {
+    &.bg-light-#{$color} {
+      background: shift-color($value, $soft-bg-level);
+      color: $value;
+      border-color: shift-color($value, $soft-bg-level);
+    }
+  }
+}
+.badge-statut-planifie {
+  background-color: color-mix(in srgb, var(--bs-primary) 55%, black);
+}
+.badge-statut-confirme,
+.badge-statut-actif {
+  background-color: color-mix(in srgb, var(--bs-success) 55%, black);
+}
+.badge-statut-honore {
+  background-color: color-mix(in srgb, var(--bs-success) 35%, black);
+}
+.badge-statut-annule {
+  background-color: color-mix(in srgb, var(--bs-secondary) 55%, black);
+}
+.badge-statut-inactif {
+  background-color: color-mix(in srgb, var(--bs-danger) 55%, black);
+}

@@ -1,0 +1,132 @@
+:host {
+  display: block;
+}
+
+.dash-card {
+  padding: 1.25rem;
+  height: 100%;
+}
+
+.dash-card-head h5 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.dash-card--link {
+  border: none;
+  background: transparent;
+  color: inherit;
+  transition: background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--bs-tertiary-bg);
+  }
+}
+
+.dash-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.dash-next {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background-color: var(--bs-body-bg);
+  color: inherit;
+  text-align: left;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--bs-tertiary-bg);
+  }
+}
+
+.dash-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.dash-pagination {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--bs-border-color);
+}
+
+.dash-list-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.55rem 0.5rem;
+  border: none;
+  border-bottom: 1px solid var(--bs-border-color);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--bs-tertiary-bg);
+  }
+}
+
+.dash-list li:last-child .dash-list-item {
+  border-bottom: none;
+}
+.dash-unavailable {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 1rem;
+  color: var(--bs-secondary-color);
+  background-color: var(--bs-tertiary-bg);
+  border-radius: var(--bs-border-radius);
+}
+.dash-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 240px;
+}
+.dash-time {
+  min-width: 3.25rem;
+  color: var(--bs-primary);
+}
+
+.dash-stat {
+  padding: 1.25rem;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  transition: background-color 0.15s ease;
+
+  &.dash-card--link:hover,
+  &.dash-card--link:focus-visible {
+    background-color: var(--bs-tertiary-bg);
+  }
+
+  .dash-stat-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .dash-stat-label {
+    color: var(--bs-secondary-color);
+  }
+}
+
+.fw-500 {
+  font-weight: 500;
+}

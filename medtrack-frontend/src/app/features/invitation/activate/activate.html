@@ -1,0 +1,208 @@
+<div class="card">
+  <div class="card-body">
+    @if (tokenStatus() === 'loading') {
+    <div class="text-center p-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+      </div>
+      <p class="mt-3 text-muted">{{ 'auth.activate.loading' | transloco }}</p>
+    </div>
+    } @else if (tokenStatus() === 'error') {
+    <div class="text-center p-4">
+      <i class="feather icon-alert-circle f-48 text-danger mb-3"></i>
+      <h4 class="mb-2">{{ 'auth.activate.invalidTitle' | transloco }}</h4>
+      <p class="text-muted mb-1">{{ tokenError() }}</p>
+      @if (tokenExpired()) {
+      <p class="text-muted">{{ 'invitation.activate.errors.expiredAction' | transloco }}</p>
+      }
+      <a [routerLink]="['/auth/login']" class="btn btn-primary mt-2">{{ 'auth.activate.backToLogin' | transloco }}</a>
+    </div>
+    } @else {
+    <form (ngSubmit)="onSubmit(activationForm)" #activationForm="ngForm">
+      <app-auth-card-header
+        [title]="'auth.activate.title' | transloco"
+        [linkLabel]="'auth.activate.alreadyRegistered' | transloco"
+        [linkRoute]="['/auth/login']"
+      />
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="email">{{ 'auth.activate.emailLabel' | transloco }}</label>
+        <input type="email" class="form-control" id="email" [value]="invitation()?.email" readonly />
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label" for="nom">{{ 'auth.activate.nomLabel' | transloco }}</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nom"
+              name="nom"
+              [(ngModel)]="activationModel.nom"
+              required
+              #nom="ngModel"
+              [class.is-invalid]="submitted() && nom.invalid"
+              [placeholder]="'auth.activate.nomPlaceholder' | transloco"
+            />
+            @if (submitted() && nom.invalid) {
+            <div class="invalid-feedback">
+              <div>{{ 'auth.activate.nomRequired' | transloco }}</div>
+            </div>
+            }
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label" for="prenom">{{ 'auth.activate.prenomLabel' | transloco }}</label>
+            <input
+              type="text"
+              class="form-control"
+              id="prenom"
+              name="prenom"
+              [(ngModel)]="activationModel.prenom"
+              required
+              #prenom="ngModel"
+              [class.is-invalid]="submitted() && prenom.invalid"
+              [placeholder]="'auth.activate.prenomPlaceholder' | transloco"
+            />
+            @if (submitted() && prenom.invalid) {
+            <div class="invalid-feedback">
+              <div>{{ 'auth.activate.prenomRequired' | transloco }}</div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label" for="specialite">{{ 'medecin.edit.labels.specialite' | transloco }}</label>
+            <input
+              type="text"
+              class="form-control"
+              id="specialite"
+              name="specialite"
+              [(ngModel)]="activationModel.specialite"
+              [placeholder]="'medecin.edit.placeholders.specialite' | transloco"
+            />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label" for="numeroOrdre">{{ 'medecin.edit.labels.numeroOrdre' | transloco }}</label>
+            <input
+              type="text"
+              class="form-control"
+              id="numeroOrdre"
+              name="numeroOrdre"
+              [(ngModel)]="activationModel.numeroOrdre"
+              [placeholder]="'medecin.edit.placeholders.numeroOrdre' | transloco"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="telephone">{{ 'medecin.edit.labels.telephone' | transloco }}</label>
+        <input
+          type="tel"
+          class="form-control"
+          id="telephone"
+          name="telephone"
+          [(ngModel)]="activationModel.telephone"
+          #telephone="ngModel"
+          pattern="^[+()0-9 .-]*$"
+          autocomplete="tel"
+          [class.is-invalid]="submitted() && telephone.invalid"
+          [placeholder]="'medecin.edit.placeholders.telephone' | transloco"
+        />
+        @if (submitted() && telephone.invalid) {
+        <div class="invalid-feedback">{{ 'medecin.edit.errors.telephoneInvalid' | transloco }}</div>
+        }
+      </div>
+
+      <div class="form-group mb-3 password-group">
+        <label class="form-label" for="password">{{ 'auth.activate.passwordLabel' | transloco }}</label>
+        <div class="password-input">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            class="form-control"
+            id="password"
+            name="password"
+            [(ngModel)]="activationModel.password"
+            required
+            minlength="8"
+            #password="ngModel"
+            [class.is-invalid]="submitted() && password.invalid"
+            [placeholder]="'auth.activate.passwordPlaceholder' | transloco"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="(showPassword() ? 'common.password.hide' : 'common.password.show') | transloco"
+          >
+            <i [ngClass]="showPassword() ? 'feather icon-eye' : 'feather icon-eye-off'" aria-hidden="true"></i>
+          </button>
+        </div>
+        @if (submitted() && password.invalid) {
+        <div class="invalid-feedback">
+          @if (password.errors?.['required']) {
+          <div>{{ 'auth.activate.passwordRequired' | transloco }}</div>
+          } @if (password.errors?.['minlength']) {
+          <div>{{ 'auth.activate.passwordMinLength' | transloco }}</div>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="form-group mb-3 password-group">
+        <label class="form-label" for="confirmPassword">{{ 'auth.activate.confirmPasswordLabel' | transloco }}</label>
+        <div class="password-input">
+          <input
+            [type]="showConfirmPassword() ? 'text' : 'password'"
+            class="form-control"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            required
+            minlength="8"
+            #confirmPasswordField="ngModel"
+            [class.is-invalid]="(submitted() && confirmPasswordField.invalid) || (submitted() && isPasswordMismatch())"
+            [placeholder]="'auth.activate.confirmPasswordPlaceholder' | transloco"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="toggleConfirmPasswordVisibility()"
+            [attr.aria-label]="(showConfirmPassword() ? 'common.password.hide' : 'common.password.show') | transloco"
+          >
+            <i [ngClass]="showConfirmPassword() ? 'feather icon-eye' : 'feather icon-eye-off'" aria-hidden="true"></i>
+          </button>
+        </div>
+        @if (submitted() && confirmPasswordField.invalid) {
+        <div class="invalid-feedback">
+          @if (confirmPasswordField.errors?.['required']) {
+          <div>{{ 'auth.activate.confirmPasswordRequired' | transloco }}</div>
+          } @if (confirmPasswordField.errors?.['minlength']) {
+          <div>{{ 'auth.activate.confirmPasswordMinLength' | transloco }}</div>
+          }
+        </div>
+        } @else if (submitted() && isPasswordMismatch()) {
+        <div class="invalid-feedback d-block">
+          <div>{{ 'auth.activate.passwordMismatch' | transloco }}</div>
+        </div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 mb-4" [disabled]="loading()">
+        @if (loading()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        } {{ 'auth.activate.submit' | transloco }}
+      </button>
+    </form>
+    }
+  </div>
+</div>

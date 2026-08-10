@@ -1,0 +1,34 @@
+// Gabarit commun à toutes les modales (NgbModal) : en-tête et pied fixes, corps qui défile,
+// hauteur plafonnée à la fenêtre. Bootstrap ne fait ça que sur .modal-dialog-scrollable,
+// qu'aucun appel modalService.open() du projet ne demande — sans ça un formulaire un peu long
+// pousse le pied (boutons Annuler/Enregistrer) hors écran, sans aucun moyen d'y accéder.
+.modal-content {
+  max-height: calc(100vh - 3.5rem);
+  overflow: hidden;
+}
+
+// Les modales de création/édition enveloppent le corps et le pied dans un <form> : sans ça
+// .modal-body n'est plus un enfant flex direct de .modal-content, et son flex:1 1 auto natif
+// (posé par Bootstrap) ne s'applique à rien puisque <form> lui-même n'est pas un conteneur flex.
+// Il faut donc que le <form> relaie la mise en page colonne à ses propres enfants.
+.modal-content > form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.modal-body {
+  overflow-y: auto;
+  // Un enfant flex garde sa taille de contenu par défaut (min-height: auto) et ignore
+  // max-height du parent tant qu'il n'est pas contraint à zéro : sans ça le corps grandit
+  // quand même et pousse le pied hors de .modal-content.
+  min-height: 0;
+}
+
+// Astérisque des champs obligatoires, un seul endroit pour toute l'app (remplace les
+// copies locales éparpillées par formulaire, avec ou sans la règle selon l'écran).
+.form-label.required::after {
+  content: ' *';
+  color: var(--bs-danger);
+}

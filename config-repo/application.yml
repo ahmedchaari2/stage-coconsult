@@ -1,0 +1,60 @@
+# Shared configuration loaded by every service through the config server.
+# Environment variables provide local defaults only; production must override them.
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/medtrack_db
+    username: postgres
+    password: ${DB_PASSWORD:chaari10}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+# JWT signing key shared by user-service, api-gateway, and notification-service.
+jwt:
+  secret: ${JWT_SECRET:medtrack_jwt_super_secret_key_2026_very_long_random_string_48_chars_min}
+
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://${EUREKA_USER:eureka}:${EUREKA_PASSWORD:eurekapass}@localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Feign timeouts are kept below the gateway budget so downstream calls fail fast.
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 1000
+        read-timeout: 2000
+
+# Shared patient-service circuit breaker settings.
+resilience4j:
+  circuitbreaker:
+    instances:
+      patientService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+
+# Shared appointment event exchange and routing keys.
+medtrack:
+  rabbitmq:
+    appointment-events-exchange: appointment.events
+    appointment-created-routing-key: appointment.created
+    appointment-status-changed-routing-key: appointment.status-changed
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    tn.coconsult.medtrack: DEBUG

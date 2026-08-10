@@ -1,0 +1,12 @@
+@if (!item().hidden && visibleChildren().length > 0) {
+  <li class="nav-item coded-menu-caption" [ngClass]="item().classes">
+    <label>{{ item().translate ? (item().translate! | transloco) : item().title }}</label>
+  </li>
+  @for (items of visibleChildren(); track items) {
+    @if (items.type === 'collapse') {
+      <app-nav-collapse [item]="items" />
+    } @else if (items.type === 'item') {
+      <app-nav-item [item]="items" />
+    }
+  }
+}

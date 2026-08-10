@@ -1,0 +1,95 @@
+@if (isVisible()) {
+  @if (!isOpen()) {
+    <button
+      type="button"
+      class="ai-chat-fab btn btn-primary"
+      (click)="toggle()"
+      [title]="'patient.aiChat.title' | transloco"
+      aria-controls="ai-chat-panel"
+    >
+      <i antIcon type="message" theme="outline"></i>
+    </button>
+  }
+
+  @if (isOpen()) {
+    <div id="ai-chat-panel" class="ai-chat-panel card" role="dialog" [attr.aria-label]="'patient.aiChat.title' | transloco">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <i antIcon type="robot" theme="outline" class="text-primary f-20"></i>
+          <div>
+            <div class="f-w-600">{{ 'patient.aiChat.title' | transloco }}</div>
+            <div class="f-12 text-muted">{{ 'patient.aiChat.subtitle' | transloco }}</div>
+          </div>
+        </div>
+        <button type="button" class="btn-close" [attr.aria-label]="'patient.aiChat.close' | transloco" (click)="close()"></button>
+      </div>
+
+      <div class="ai-chat-body">
+        @if (entries().length === 0) {
+          <p class="text-muted f-14 mb-3">{{ 'patient.aiChat.empty' | transloco }}</p>
+        }
+
+        @for (entry of entries(); track $index) {
+          <div class="ai-chat-bubble-row" [class.ai-chat-bubble-row-user]="entry.role === 'user'">
+            <div
+              class="ai-chat-bubble"
+              [class.ai-chat-bubble-user]="entry.role === 'user'"
+              [class.ai-chat-bubble-error]="entry.role === 'error'"
+            >
+              {{ entry.text }}
+            </div>
+          </div>
+        }
+
+        @if (isSending()) {
+          <div class="ai-chat-bubble-row">
+            <div class="ai-chat-bubble ai-chat-typing" [attr.aria-label]="'patient.aiChat.typing' | transloco">
+              <span class="ai-chat-dot"></span>
+              <span class="ai-chat-dot"></span>
+              <span class="ai-chat-dot"></span>
+            </div>
+          </div>
+        }
+
+        <div #scrollAnchor></div>
+      </div>
+
+      @if (entries().length === 0) {
+        <div class="ai-chat-suggestions">
+          @for (suggestion of suggestions(); track suggestion.label) {
+            <button
+              type="button"
+              class="ai-chat-suggestion"
+              [disabled]="isSending()"
+              [title]="suggestion.question"
+              (click)="sendSuggestion(suggestion.question)"
+            >
+              {{ suggestion.label }}
+            </button>
+          }
+        </div>
+      }
+
+      <div class="ai-chat-footer">
+        <textarea
+          #messageInput
+          class="form-control"
+          rows="1"
+          [placeholder]="'patient.aiChat.placeholder' | transloco"
+          [disabled]="isSending()"
+          (keydown.enter)="onEnter($event)"
+        ></textarea>
+        <button
+          type="button"
+          class="btn btn-primary ai-chat-send d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"
+          [disabled]="isSending()"
+          (click)="onSubmit()"
+          [title]="'patient.aiChat.send' | transloco"
+        >
+          <i antIcon type="send" theme="outline"></i>
+        </button>
+      </div>
+    </div>
+  }
+}

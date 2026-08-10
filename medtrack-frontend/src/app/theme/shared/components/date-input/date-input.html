@@ -1,0 +1,29 @@
+<div class="input-group" [class.input-group-sm]="size() === 'sm'">
+  <input
+    #dp="ngbDatepicker"
+    ngbDatepicker
+    navigation="select"
+    type="text"
+    class="form-control"
+    [class.is-invalid]="isInvalid()"
+    [id]="inputId()"
+    placeholder="jj/mm/aaaa"
+    [ngModel]="value"
+    (ngModelChange)="onValueChange($event)"
+    (blur)="onTouched()"
+    [disabled]="disabled"
+    [minDate]="$any(minDateStruct())"
+    [maxDate]="$any(maxDateStruct())"
+    [markDisabled]="dateDisabled()"
+    autocomplete="off"
+  />
+  <button
+    type="button"
+    class="btn btn-outline-secondary"
+    [disabled]="disabled"
+    (click)="dp.toggle()"
+    [attr.aria-label]="'common.datePicker.open' | transloco"
+  >
+    <i antIcon type="calendar" theme="outline"></i>
+  </button>
+</div>

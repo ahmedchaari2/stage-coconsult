@@ -1,0 +1,11 @@
+@if (actif()) {
+<span class="badge rounded-pill badge-statut-actif">
+  <i antIcon type="check-circle" theme="outline" class="me-1" aria-hidden="true"></i>
+  {{ 'medecin.gestion.status.actif' | transloco }}
+</span>
+} @else {
+<span class="badge rounded-pill badge-statut-inactif">
+  <i antIcon type="stop" theme="outline" class="me-1" aria-hidden="true"></i>
+  {{ 'medecin.gestion.status.inactif' | transloco }}
+</span>
+}

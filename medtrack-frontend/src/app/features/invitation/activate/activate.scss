@@ -1,0 +1,32 @@
+.card {
+  width: 100%;
+}
+
+.password-group {
+  .password-input {
+    position: relative;
+
+    .form-control {
+      padding-right: 40px;
+    }
+  }
+}
+
+.password-toggle {
+  cursor: pointer;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
+  color: inherit;
+
+  ::ng-deep.datta-rtl & {
+    right: auto;
+    left: 12px;
+  }
+}

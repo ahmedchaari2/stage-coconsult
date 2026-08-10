@@ -1,0 +1,14 @@
+# Docker Compose overlay: only the hostnames change (container names instead of
+# localhost). Activated by setting SPRING_PROFILES_ACTIVE=docker on each service.
+# Everything else (credentials, ports, business config) is inherited from application.yml.
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/medtrack_db
+  rabbitmq:
+    host: rabbitmq
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_USER:eureka}:${EUREKA_PASSWORD:eurekapass}@eureka-server:8761/eureka/

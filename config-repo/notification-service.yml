@@ -1,0 +1,28 @@
+# notification-service consumes appointment events; the queue is defined here.
+server:
+  port: 8086
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ahmedchaari81@gmail.com
+    password: "${MAIL_PASSWORD:ijzz cyfy qkhp vjoe}"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+medtrack:
+  mail:
+    from: ahmedchaari81@gmail.com
+    rappel-veille:
+      active: true
+      cron: "0 0 18 * * *"
+  rabbitmq:
+    appointment-events-queue: notification.appointment-events
+  notification:
+      # Read notifications are purged daily; unread notifications are kept.
+    retention-days: 90

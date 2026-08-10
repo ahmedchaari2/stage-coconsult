@@ -1,0 +1,110 @@
+<div class="card">
+  <div class="card-body">
+    <form (ngSubmit)="onSubmit(loginForm)" #loginForm="ngForm">
+      <app-auth-card-header [title]="'auth.login.title' | transloco" />
+      <div class="input-group mb-3">
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          [(ngModel)]="loginModel.email"
+          required
+          email
+          #email="ngModel"
+          [class.is-invalid]="submitted() && email.invalid"
+          [placeholder]="'auth.login.emailPlaceholder' | transloco"
+        />
+        @if (submitted() && email.invalid) {
+          <div class="invalid-feedback">
+            @if (email.errors?.['required']) {
+              <div>{{ 'auth.login.emailRequired' | transloco }}</div>
+            }
+            @if (email.errors?.['email']) {
+              <div>{{ 'auth.login.emailInvalid' | transloco }}</div>
+            }
+          </div>
+        }
+      </div>
+      <div class="input-group mb-4">
+        @if (!showPassword()) {
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            [(ngModel)]="loginModel.password"
+            required
+            minlength="8"
+            #password="ngModel"
+            [class.is-invalid]="submitted() && password.invalid"
+            [placeholder]="'auth.login.passwordPlaceholder' | transloco"
+          />
+          <button
+            type="button"
+            id="togglePassword"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="(showPassword() ? 'common.password.hide' : 'common.password.show') | transloco"
+          >
+            <i [ngClass]="showPassword() ? 'feather icon-eye' : 'feather icon-eye-off'" aria-hidden="true"></i>
+          </button>
+          @if (submitted() && password.invalid) {
+            <div class="invalid-feedback">
+              @if (password.errors?.['required']) {
+                <div>{{ 'auth.login.passwordRequired' | transloco }}</div>
+              }
+              @if (password.errors?.['minlength']) {
+                <div>{{ 'auth.login.passwordMinLength' | transloco }}</div>
+              }
+            </div>
+          }
+        } @else {
+          <input
+            type="text"
+            class="form-control"
+            id="password"
+            name="password"
+            [(ngModel)]="loginModel.password"
+            required
+            minlength="8"
+            #password="ngModel"
+            [class.is-invalid]="submitted() && password.invalid"
+            [placeholder]="'auth.login.passwordPlaceholder' | transloco"
+          />
+          <button
+            type="button"
+            id="togglePassword"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="(showPassword() ? 'common.password.hide' : 'common.password.show') | transloco"
+          >
+            <i [ngClass]="showPassword() ? 'feather icon-eye' : 'feather icon-eye-off'" aria-hidden="true"></i>
+          </button>
+          @if (submitted() && password.invalid) {
+            <div class="invalid-feedback">
+              @if (password.errors?.['required']) {
+                <div>{{ 'auth.login.passwordRequired' | transloco }}</div>
+              }
+              @if (password.errors?.['minlength']) {
+                <div>{{ 'auth.login.passwordMinLength' | transloco }}</div>
+              }
+            </div>
+          }
+        }
+      </div>
+      <div class="d-flex justify-content-end mb-4">
+        <a [routerLink]="['/auth/forgot-password']" class="link-primary f-14">{{ 'auth.login.forgotPasswordLink' | transloco }}</a>
+      </div>
+      @if (successMessage()) {
+        <div class="alert alert-success mb-3" role="alert">
+          {{ successMessage() }}
+        </div>
+      }
+      <button type="submit" class="btn btn-primary w-100 mb-4" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        }
+        {{ 'auth.login.submit' | transloco }}
+      </button>
+    </form>
+  </div>
+</div>

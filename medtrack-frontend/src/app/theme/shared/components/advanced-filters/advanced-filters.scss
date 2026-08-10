@@ -1,0 +1,39 @@
+.advanced-filters-panel {
+  background-color: var(--bs-secondary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}
+
+.btn-close-search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 767.98px) {
+  .advanced-filters-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    border-radius: 0;
+    overflow-y: auto;
+  }
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.35rem 0.65rem;
+  font-weight: 500;
+  background-color: var(--bs-primary-bg-subtle);
+  color: var(--bs-primary-text-emphasis);
+  border: 1px solid var(--bs-border-color);
+}
+
+.btn-close-chip {
+  font-size: 0.6rem;
+  padding: 0;
+  width: 0.6rem;
+  height: 0.6rem;
+}

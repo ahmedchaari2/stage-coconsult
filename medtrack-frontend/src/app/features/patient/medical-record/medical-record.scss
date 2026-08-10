@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+.medical-record-section-nav .nav-link {
+  border: 1px solid var(--bs-border-color);
+}
+
+.medical-record-section-nav .nav-link:hover,
+.medical-record-section-nav .nav-link:focus-visible {
+  border-color: var(--bs-primary);
+}

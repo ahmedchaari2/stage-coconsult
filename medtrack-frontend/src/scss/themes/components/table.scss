@@ -1,0 +1,78 @@
+.table {
+  font-size: 0.875rem;
+
+  &.table-align-center {
+    td,
+    th {
+      vertical-align: middle;
+    }
+  }
+  thead th {
+    padding: 0.75rem;
+  }
+  td,
+  th {
+    vertical-align: middle;
+    &:first-child {
+      padding-left: 24px;
+    }
+    &:last-child {
+      padding-right: 24px;
+    }
+  }
+  &.table-borderless {
+    td,
+    th {
+      border: none !important;
+    }
+  }
+  thead th {
+    background-color: $gray-100;
+    border-top: 1px solid $gray-300;
+    border-bottom: 2px solid $gray-300;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: $gray-700;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 0.75rem;
+    border-color: $gray-300;
+    line-height: 1.4;
+  }
+
+  th[appSortableColumn] {
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: $primary;
+    }
+
+    &::after {
+      content: '\2195';
+      display: inline-block;
+      margin-left: 6px;
+      opacity: 0.4;
+      font-size: 0.9em;
+    }
+
+    &.sorted-asc::after {
+      content: '\2191';
+      opacity: 1;
+      color: $primary;
+    }
+
+    &.sorted-desc::after {
+      content: '\2193';
+      opacity: 1;
+      color: $primary;
+    }
+  }
+}
+
+.table-hover tbody tr:hover {
+  background-color: $gray-200;
+}

@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+.app-pagination {
+  row-gap: 0.75rem;
+}
+
+.app-pagination__range {
+  font-size: 0.875rem;
+}
+.app-pagination__page-of {
+  color: var(--bs-secondary-color);
+}
+@media (max-width: 575.98px) {
+  .app-pagination {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .app-pagination__size,
+  .app-pagination__range {
+    justify-content: center;
+  }
+
+  .app-pagination nav[aria-label='Pagination'] .pagination {
+    justify-content: center;
+  }
+}
+.page-number {
+  min-width: 2.5rem;
+  text-align: center;
+}
+.page-item.active .page-link {
+  color: var(--bs-pagination-active-color);
+  background-color: var(--bs-pagination-active-bg);
+  border-color: var(--bs-pagination-active-border-color);
+}
+.page-item:not(.disabled):not(.active) .page-link:hover {
+  color: var(--bs-pagination-active-color);
+  background-color: var(--bs-pagination-active-bg);
+  border-color: var(--bs-pagination-active-border-color);
+}
+.page-item.disabled .page-link {
+  color: var(--bs-pagination-disabled-color);
+  background-color: var(--bs-pagination-disabled-bg);
+  border-color: var(--bs-pagination-disabled-border-color);
+}

@@ -1,0 +1,240 @@
+@if (isLoading()) {
+  <div class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+    </div>
+    <p class="mt-3 text-muted mb-0">{{ 'dashboard.loading' | transloco }}</p>
+  </div>
+} @else if (error()) {
+  <div class="alert alert-danger" role="alert">
+    {{ error() }}
+    <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="load()">{{ 'common.buttons.retry' | transloco }}</button>
+  </div>
+} @else if (data(); as d) {
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <app-card [showHeader]="false" [padding]="0">
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <h5 class="mb-0">
+              <i antIcon type="calendar" theme="outline" class="me-2"></i>
+              {{ 'dashboard.medecin.rdvJour.title' | transloco }}
+            </h5>
+            @if (d.rendezVousJour.disponible) {
+              <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="goToday()">
+                {{ 'dashboard.seeAll' | transloco }}
+                <i antIcon type="right" theme="outline"></i>
+              </button>
+            }
+          </div>
+          @if (!d.rendezVousJour.disponible) {
+            <ng-container [ngTemplateOutlet]="unavailable"></ng-container>
+          } @else if (!hasRdv()) {
+            <p class="text-muted mb-0 p-2">{{ 'dashboard.medecin.rdvJour.empty' | transloco }}</p>
+          } @else {
+            <div class="row align-items-center">
+              <div class="col-7">
+                <apx-chart
+                  [series]="rdvChart().series!"
+                  [chart]="rdvChart().chart!"
+                  [labels]="rdvChart().labels!"
+                  [colors]="rdvChart().colors!"
+                  [legend]="rdvChart().legend!"
+                  [dataLabels]="rdvChart().dataLabels!"
+                  [stroke]="rdvChart().stroke!"
+                />
+              </div>
+              <div class="col-5">
+                <div class="h2 mb-0">{{ d.rendezVousJour.total }}</div>
+                <div class="text-muted mb-2">{{ 'dashboard.medecin.rdvJour.total' | transloco }}</div>
+                @for (s of statutOrder; track s) {
+                  <div class="d-flex justify-content-between small">
+                    <span>{{ 'appointment.statut.' + s | transloco }}</span>
+                    <span class="fw-500">{{ d.rendezVousJour.parStatut[s] ?? 0 }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+            @if (d.rendezVousJour.prochain; as p) {
+              <button type="button" class="dash-next" (click)="goToAppointment(p.id)">
+                <span class="badge bg-primary me-2">{{ 'dashboard.medecin.rdvJour.prochain' | transloco }}</span>
+                <span class="fw-500">{{ p.dateHeure | timeFormat }}</span>
+                <span class="ms-2">{{ p.patientNom }} {{ p.patientPrenom }}</span>
+                <span class="text-muted ms-2">— {{ p.motif }}</span>
+                <i antIcon type="right" theme="outline" class="ms-auto"></i>
+              </button>
+            }
+          }
+        </div>
+      </app-card>
+    </div>
+
+    <div class="col-lg-3">
+      <app-card [showHeader]="false" [padding]="0">
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <h5 class="mb-0">
+              <i antIcon type="file-text" theme="outline" class="me-2"></i>
+              {{ 'dashboard.medecin.consultations.title' | transloco }}
+            </h5>
+          </div>
+          @if (!d.consultations.disponible) {
+            <ng-container [ngTemplateOutlet]="unavailable"></ng-container>
+          } @else {
+            <div class="h2 mb-0">{{ d.consultations.ceMois }}</div>
+            <div class="text-muted mb-2">{{ 'dashboard.medecin.consultations.ceMois' | transloco }}</div>
+            <div class="d-flex align-items-center small">
+              <span
+                class="badge me-2"
+                [class.bg-success-subtle]="d.consultations.variation > 0"
+                [class.text-success]="d.consultations.variation > 0"
+                [class.bg-danger-subtle]="d.consultations.variation < 0"
+                [class.text-danger]="d.consultations.variation < 0"
+                [class.bg-secondary-subtle]="d.consultations.variation === 0"
+                [class.text-secondary]="d.consultations.variation === 0"
+              >
+                {{ d.consultations.variation > 0 ? '+' : '' }}{{ d.consultations.variation }}
+              </span>
+              <span class="text-muted">
+                {{ 'dashboard.medecin.consultations.moisPrecedent' | transloco }} : {{ d.consultations.moisPrecedent }}
+              </span>
+            </div>
+          }
+        </div>
+      </app-card>
+    </div>
+
+    <div class="col-lg-3">
+      <app-card [showHeader]="false" [padding]="0">
+        <button type="button" class="dash-card dash-card--link w-100 text-start" (click)="goToPatients()">
+          <div class="dash-card-head">
+            <h5 class="mb-0">
+              <i antIcon type="team" theme="outline" class="me-2"></i>
+              {{ 'dashboard.medecin.patients.title' | transloco }}
+            </h5>
+          </div>
+          @if (!d.patients.disponible) {
+            <ng-container [ngTemplateOutlet]="unavailable"></ng-container>
+          } @else {
+            <div class="h2 mb-0">{{ d.patients.suivis }}</div>
+            <div class="text-muted mb-2">{{ 'dashboard.medecin.patients.suivis' | transloco }}</div>
+            <div class="small">
+              <span class="badge bg-primary-subtle text-primary">+{{ d.patients.nouveauxCeMois }}</span>
+              {{ 'dashboard.medecin.patients.nouveaux' | transloco }}
+            </div>
+          }
+        </button>
+      </app-card>
+    </div>
+
+    <div class="col-lg-6">
+      <app-card [showHeader]="false" [padding]="0">
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <h5 class="mb-0">
+              <i antIcon type="medicine-box" theme="outline" class="me-2"></i>
+              {{ 'dashboard.medecin.traitements.title' | transloco }}
+            </h5>
+            @if (d.traitementsAEcheance.disponible && d.traitementsAEcheance.total > 0) {
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning-subtle text-warning">{{ d.traitementsAEcheance.total }}</span>
+                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="goToPrescriptions()">
+                  {{ 'dashboard.seeAll' | transloco }}
+                  <i antIcon type="right" theme="outline"></i>
+                </button>
+              </div>
+            }
+          </div>
+          @if (!d.traitementsAEcheance.disponible) {
+            <ng-container [ngTemplateOutlet]="unavailable"></ng-container>
+          } @else if (d.traitementsAEcheance.items.length === 0) {
+            <p class="text-muted mb-0 p-2">{{ 'dashboard.medecin.traitements.empty' | transloco }}</p>
+          } @else {
+            <ul class="dash-list">
+              @for (t of traitementsPreview(); track t.prescriptionId) {
+                <li>
+                  <button type="button" class="dash-list-item" (click)="goToPrescriptions()">
+                    <span class="fw-500">{{ t.medicament }}</span>
+                    <span class="text-muted small ms-2">
+                      {{ 'dashboard.medecin.traitements.finLe' | transloco: { date: (t.dateFin | dateFormat) } }}
+                    </span>
+                    <span
+                      class="badge ms-auto"
+                      [class.bg-danger-subtle]="t.joursRestants <= 2"
+                      [class.text-danger]="t.joursRestants <= 2"
+                      [class.bg-warning-subtle]="t.joursRestants > 2"
+                      [class.text-warning]="t.joursRestants > 2"
+                    >
+                      {{ t.joursRestants }} {{ 'dashboard.medecin.traitements.joursUnit' | transloco }}
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </app-card>
+    </div>
+
+    <div class="col-lg-6">
+      <app-card [showHeader]="false" [padding]="0">
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <h5 class="mb-0">
+              <i antIcon type="warning" theme="outline" class="me-2"></i>
+              {{ 'dashboard.medecin.sansDossier.title' | transloco }}
+            </h5>
+            @if (d.patientsSansDossier.disponible && d.patientsSansDossier.total > 0) {
+              <span class="badge bg-warning-subtle text-warning">{{ d.patientsSansDossier.total }}</span>
+            }
+          </div>
+          @if (!d.patientsSansDossier.disponible) {
+            <ng-container [ngTemplateOutlet]="unavailable"></ng-container>
+          } @else if (d.patientsSansDossier.items.length === 0) {
+            <p class="text-muted mb-0 p-2">{{ 'dashboard.medecin.sansDossier.empty' | transloco }}</p>
+          } @else {
+            <ul class="dash-list">
+              @for (p of patientsSansDossierItems(); track p.patientId) {
+                <li>
+                  <button type="button" class="dash-list-item" (click)="goToPatient(p.patientId)">
+                    <span class="fw-500">{{ p.nom }} {{ p.prenom }}</span>
+                    @if (p.numeroDossier) {
+                      <span class="text-muted small ms-2">{{ p.numeroDossier }}</span>
+                    }
+                    <span class="badge bg-primary-subtle text-primary ms-auto">
+                      {{ 'dashboard.medecin.sansDossier.action' | transloco }}
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+            @if (d.patientsSansDossier.items.length > dashboardPageSizeOptions[0]) {
+              <div class="dash-pagination mt-3">
+                <app-pagination
+                  [page]="patientsSansDossierPage()"
+                  [totalPages]="patientsSansDossierTotalPages()"
+                  [totalElements]="d.patientsSansDossier.items.length"
+                  [size]="patientsSansDossierSize()"
+                  [sizeOptions]="dashboardPageSizeOptions"
+                  (pageChange)="onPatientsSansDossierPageChange($event)"
+                  (sizeChange)="onPatientsSansDossierSizeChange($event)"
+                />
+              </div>
+            }
+          }
+        </div>
+      </app-card>
+    </div>
+  </div>
+}
+
+<ng-template #unavailable>
+  <div class="dash-unavailable">
+    <i antIcon type="warning" theme="outline" class="me-2"></i>
+    <span>{{ 'dashboard.unavailable' | transloco }}</span>
+    <button type="button" class="btn btn-outline-secondary btn-sm ms-2" (click)="load()">
+      <i antIcon type="reload" theme="outline" class="me-1"></i>
+      {{ 'common.buttons.retry' | transloco }}
+    </button>
+  </div>
+</ng-template>

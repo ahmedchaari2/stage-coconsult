@@ -1,0 +1,31 @@
+@for (breadcrumb of navigationList; track breadcrumb; let last = $last) {
+  @if (last && breadcrumb.breadcrumbs !== false) {
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a [routerLink]="['/dashboard']" class="home">{{ 'nav.breadcrumbHome' | transloco }}</a>
+              </li>
+              @for (breadcrumb of navigationList; track breadcrumb) {
+                @if (isLink(breadcrumb.url)) {
+                  <li class="breadcrumb-item">
+                    <a [routerLink]="breadcrumb.url" class="f-14 f-w-600">
+                      {{ breadcrumb.translate ? (breadcrumb.translate | transloco) : breadcrumb.title }}
+                    </a>
+                  </li>
+                }
+                @if (breadcrumb.url === true && breadcrumb.type !== 'group') {
+                  <li class="breadcrumb-item">
+                    <span class="f-14 f-w-600">{{ breadcrumb.translate ? (breadcrumb.translate | transloco) : breadcrumb.title }}</span>
+                  </li>
+                }
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

@@ -1,0 +1,17 @@
+<div class="page-header">
+  <div class="page-block">
+    <div class="row align-items-center">
+      <div class="col-md-12">
+        <h4 class="m-b-10">{{ 'dashboard.title' | transloco }}</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (isAdmin()) {
+  <app-admin-dashboard />
+} @else if (isMedecin()) {
+  <app-medecin-dashboard />
+} @else {
+  <div class="text-center text-muted p-5">{{ 'dashboard.noRole' | transloco }}</div>
+}

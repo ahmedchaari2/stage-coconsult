@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.detail-section-title {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--bs-border-color);
+  font-weight: 600;
+}

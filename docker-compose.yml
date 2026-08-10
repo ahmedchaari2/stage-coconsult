@@ -1,0 +1,183 @@
+name: medtrack
+
+x-service-environment: &service-environment
+  SPRING_PROFILES_ACTIVE: docker
+  # Config import is resolved before config-server can return application-docker.yml.
+  CONFIG_SERVER_URL: http://config-server:8888
+  DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+  RABBITMQ_USER: ${RABBITMQ_USER:-medtrack}
+  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-medtrack}
+  EUREKA_USER: ${EUREKA_USER:-eureka}
+  EUREKA_PASSWORD: ${EUREKA_PASSWORD:-eurekapass}
+  JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+  MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+
+x-business-service: &business-service
+  environment: *service-environment
+  restart: on-failure
+  depends_on:
+    postgres:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+    eureka-server:
+      condition: service_healthy
+    config-server:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: medtrack_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d medtrack_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-medtrack}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-medtrack}
+    ports:
+      - "${RABBITMQ_MANAGEMENT_PORT:-15673}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+    environment:
+      EUREKA_USER: ${EUREKA_USER:-eureka}
+      EUREKA_PASSWORD: ${EUREKA_PASSWORD:-eurekapass}
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8761'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    restart: on-failure
+
+  config-server:
+    build:
+      context: ./config-server
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      CONFIG_REPO_PATH: /config-repo
+    volumes:
+      - ./config-repo:/config-repo:ro
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8888'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: on-failure
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    environment: *service-environment
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    restart: on-failure
+
+  patient-service:
+    <<: *business-service
+    build:
+      context: .
+      dockerfile: patient-service/Dockerfile
+
+  user-service:
+    <<: *business-service
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    volumes:
+      - profile-photos:/app/uploads/profile-photos
+
+  medicalrecord-service:
+    <<: *business-service
+    build:
+      context: .
+      dockerfile: medicalrecord-service/Dockerfile
+
+  appointment-service:
+    <<: *business-service
+    build:
+      context: .
+      dockerfile: appointment-service/Dockerfile
+
+  prescription-service:
+    <<: *business-service
+    build:
+      context: .
+      dockerfile: prescription-service/Dockerfile
+
+  notification-service:
+    <<: *business-service
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    ports:
+      - "8086:8086"
+
+  dashboard-service:
+    <<: *business-service
+    build:
+      context: .
+      dockerfile: dashboard-service/Dockerfile
+
+  ai-service:
+    <<: *business-service
+    build:
+      context: .
+      dockerfile: ai-service/Dockerfile
+    environment:
+      <<: *service-environment
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
+
+  frontend:
+    build:
+      context: ./medtrack-frontend
+    depends_on:
+      api-gateway:
+        condition: service_started
+      notification-service:
+        condition: service_started
+    ports:
+      - "4200:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  rabbitmq-data:
+  profile-photos:

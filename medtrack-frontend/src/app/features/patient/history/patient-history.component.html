@@ -1,0 +1,293 @@
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div class="btn-group btn-group-sm" role="group" [attr.aria-label]="'patient.history.filters.label' | transloco">
+    <button
+      type="button"
+      class="btn"
+      [class.btn-primary]="typeFilter() === 'all'"
+      [class.btn-outline-primary]="typeFilter() !== 'all'"
+      (click)="onFilterChange('all')"
+    >
+      {{ 'patient.history.filters.all' | transloco }} ({{ counts().all }})
+    </button>
+    <button
+      type="button"
+      class="btn"
+      [class.btn-primary]="typeFilter() === 'consultation'"
+      [class.btn-outline-primary]="typeFilter() !== 'consultation'"
+      (click)="onFilterChange('consultation')"
+    >
+      {{ 'patient.history.types.consultation' | transloco }} ({{ counts().consultation }})
+    </button>
+    <button
+      type="button"
+      class="btn"
+      [class.btn-primary]="typeFilter() === 'appointment'"
+      [class.btn-outline-primary]="typeFilter() !== 'appointment'"
+      (click)="onFilterChange('appointment')"
+    >
+      {{ 'patient.history.types.appointment' | transloco }} ({{ counts().appointment }})
+    </button>
+    <button
+      type="button"
+      class="btn"
+      [class.btn-primary]="typeFilter() === 'prescription'"
+      [class.btn-outline-primary]="typeFilter() !== 'prescription'"
+      (click)="onFilterChange('prescription')"
+    >
+      {{ 'patient.history.types.prescription' | transloco }} ({{ counts().prescription }})
+    </button>
+  </div>
+</div>
+
+@if (isLoading()) {
+  <div class="text-center p-5">
+    <app-spinner [backgroundColor]="'var(--bs-primary)'" [spinner]="spinkit" />
+    <p class="mt-3 text-muted mb-0">{{ 'patient.history.loading' | transloco }}</p>
+  </div>
+} @else {
+  @if (sourceErrorCount() > 0) {
+    <div class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center gap-2 py-2" role="alert">
+      <div>
+        <div class="f-w-500">{{ 'patient.history.errors.partial' | transloco }}</div>
+        @if (consultationsError()) {
+          <div class="f-12">· {{ 'patient.history.errors.consultationsFailed' | transloco }}</div>
+        }
+        @if (appointmentsError()) {
+          <div class="f-12">· {{ 'patient.history.errors.appointmentsFailed' | transloco }}</div>
+        }
+        @if (prescriptionsError()) {
+          <div class="f-12">· {{ 'patient.history.errors.prescriptionsFailed' | transloco }}</div>
+        }
+      </div>
+      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="load()">{{ 'common.buttons.retry' | transloco }}</button>
+    </div>
+  }
+
+  @if (entries().length === 0) {
+    @if (sourceErrorCount() === 0) {
+      <div class="text-center p-5">
+        <i antIcon type="history" theme="outline" class="f-48 text-muted mb-3"></i>
+        <h5 class="text-muted">{{ 'patient.history.empty.title' | transloco }}</h5>
+        <p class="text-muted mb-0">{{ 'patient.history.empty.text' | transloco }}</p>
+      </div>
+    }
+  } @else {
+    @if (truncated()) {
+      <div class="alert alert-warning py-2" role="alert">{{ 'patient.history.truncated' | transloco }}</div>
+    }
+
+    @if (visibleEntries().length === 0) {
+      <div class="text-center p-4">
+        <p class="text-muted mb-0">{{ 'patient.history.empty.filtered' | transloco }}</p>
+      </div>
+    } @else {
+      <ul class="patient-timeline">
+        @for (
+          entry of pagedEntries();
+          track entry.type + '-' + (entry.consultation?.id ?? entry.appointment?.id ?? entry.prescription?.id)
+        ) {
+          <li class="timeline-item timeline-item--{{ entry.type }}">
+            <span class="timeline-marker">
+              @switch (entry.type) {
+                @case ('consultation') {
+                  <i antIcon type="file-text" theme="outline"></i>
+                }
+                @case ('appointment') {
+                  <i antIcon type="calendar" theme="outline"></i>
+                }
+                @case ('prescription') {
+                  <i antIcon type="medicine-box" theme="outline"></i>
+                }
+              }
+            </span>
+
+            <button type="button" class="timeline-content" (click)="openDetail(entry)">
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <span class="timeline-date f-w-500">{{ formatEntryDate(entry) }}</span>
+                <span class="d-inline-flex align-items-center gap-2">
+                  <span class="badge rounded-pill timeline-badge">{{ 'patient.history.types.' + entry.type | transloco }}</span>
+                  <span class="visually-hidden">{{ 'common.buttons.view' | transloco }}</span>
+                </span>
+              </div>
+              <div class="f-w-500 mt-1">{{ entry.title }}</div>
+              @if (entry.subtitle) {
+                <div class="text-muted f-13">{{ entry.subtitle }}</div>
+              }
+              @if (entry.appointment; as a) {
+                <app-appointment-statut-badge [statut]="a.statut" class="mt-1" />
+              }
+              @if (entry.consultation; as c) {
+                <div class="text-muted f-13">{{ medecinDisplay(c.medecinId) }}</div>
+              }
+              @if (entry.prescription; as p) {
+                @if (p.renouvelable) {
+                  <span class="badge rounded-pill bg-info-subtle text-info mt-1">{{ 'prescription.badges.renouvelable' | transloco }}</span>
+                }
+              }
+            </button>
+          </li>
+        }
+      </ul>
+
+      <app-pagination
+        [page]="page()"
+        [totalPages]="totalPages()"
+        [totalElements]="visibleEntries().length"
+        [size]="size()"
+        [sizeOptions]="sizeOptions"
+        (pageChange)="onPageChange($event)"
+        (sizeChange)="onSizeChange($event)"
+      />
+    }
+  }
+}
+
+<ng-template #detailModal let-modal>
+  @if (selected(); as entry) {
+    <div class="modal-header">
+      <h5 class="modal-title">
+        {{ 'patient.history.detail.' + entry.type | transloco }}
+        <span class="text-muted f-14 fw-normal ms-1">— {{ formatEntryDate(entry) }}</span>
+      </h5>
+      <button
+        type="button"
+        class="btn-close"
+        [attr.aria-label]="'common.buttons.close' | transloco"
+        (click)="modal.dismiss('cancel')"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <div class="row g-3">
+        @if (entry.consultation; as c) {
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.date' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ formatEntryDate(entry) }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.medecin' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ medecinDisplay(c.medecinId) }}</p>
+          </div>
+          <div class="col-12">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.motif' | transloco }}</label>
+            <p class="form-control-plaintext f-w-500 mb-0">{{ c.motif }}</p>
+          </div>
+          <div class="col-12">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.diagnostic' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ c.diagnostic || '—' }}</p>
+          </div>
+          <div class="col-12">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.columns.notes' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ c.notes || '—' }}</p>
+          </div>
+          <div class="col-12">
+            <hr class="my-2" />
+            <h6 class="text-muted mb-2">{{ 'medicalRecord.consultations.vitalsSectionTitle' | transloco }}</h6>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.vitals.tension' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ tensionDisplay(c) }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.vitals.pouls' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ c.pouls != null ? c.pouls + ' bpm' : '—' }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.vitals.poids' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ c.poids != null ? c.poids + ' kg' : '—' }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medicalRecord.consultations.vitals.temperature' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ c.temperature != null ? c.temperature + ' °C' : '—' }}</p>
+          </div>
+        }
+
+        @if (entry.appointment; as a) {
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.patient' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ a.patientNom }} {{ a.patientPrenom }}</p>
+          </div>
+          @if (isAdmin()) {
+            <div class="col-md-6">
+              <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.medecin' | transloco }}</label>
+              <p class="form-control-plaintext mb-0">{{ appointmentMedecin(a) }}</p>
+            </div>
+          }
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'appointment.list.columns.dateHeure' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ formatEntryDate(entry) }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.statut' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">
+              <app-appointment-statut-badge [statut]="a.statut" />
+            </p>
+          </div>
+          <div class="col-12">
+            <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.motif' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ a.motif }}</p>
+          </div>
+          <div class="col-12">
+            <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.notes' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ a.notes || '—' }}</p>
+          </div>
+        }
+
+        @if (entry.prescription; as p) {
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'prescription.fields.medicament' | transloco }}</label>
+            <p class="form-control-plaintext f-w-500 mb-0">{{ p.medicament }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'prescription.fields.posologie' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ p.posologie }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'prescription.list.columns.patient' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ p.patientNom }} {{ p.patientPrenom }}</p>
+          </div>
+          @if (isAdmin()) {
+            <div class="col-md-6">
+              <label class="form-label text-muted mb-1">{{ 'prescription.list.columns.medecin' | transloco }}</label>
+              <p class="form-control-plaintext mb-0">{{ p.medecinNom }} {{ p.medecinPrenom }}</p>
+            </div>
+          }
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'prescription.list.columns.consultationDate' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ p.consultationDate ? (p.consultationDate | dateFormat) : '—' }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'prescription.fields.dureeJours' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">
+              {{ p.dureeJours ? p.dureeJours + ' ' + ('prescription.list.joursUnit' | transloco) : '—' }}
+            </p>
+          </div>
+          <div class="col-12">
+            <label class="form-label text-muted mb-1">{{ 'prescription.fields.instructions' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">{{ p.instructions || '—' }}</p>
+          </div>
+          <div class="col-12 d-flex flex-wrap gap-2">
+            @if (p.renouvelable) {
+              <span class="badge rounded-pill bg-info-subtle text-info">{{ 'prescription.badges.renouvelable' | transloco }}</span>
+            }
+            @if (p.archived) {
+              <span class="badge rounded-pill bg-secondary">{{ 'common.labels.archived' | transloco }}</span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+    <div class="modal-footer">
+      @if (entry.consultation; as c) {
+        <button type="button" class="btn btn-outline-primary" (click)="openPrescriptions(c, modal)">
+          <i antIcon type="medicine-box" theme="outline" class="me-1"></i>
+          {{ 'prescription.modal.title' | transloco }}
+        </button>
+      }
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.close' | transloco }}
+      </button>
+    </div>
+  }
+</ng-template>
+
+<app-prescriptions-modal />

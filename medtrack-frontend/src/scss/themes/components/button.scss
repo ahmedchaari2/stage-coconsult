@@ -1,0 +1,142 @@
+.btn {
+  font-size: 14px;
+  i {
+    font-size: 18px;
+  }
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+  &[class*='btn-link-'],
+  &[class*='btn-light-'] {
+    box-shadow: none;
+  }
+  &[class*='btn-outline-']:not(:hover) {
+    box-shadow: none;
+  }
+  &.btn-shadow {
+    box-shadow: 0 6px 7px -1px rgba(80, 86, 175, 0.3);
+  }
+  &.btn-sm {
+    i {
+      font-size: 14px;
+    }
+  }
+}
+.table-record-link {
+  color: $body-color;
+  font: inherit;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    color: $primary;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  &:focus-visible {
+    color: $primary;
+    outline: 2px solid rgba($primary, 0.45);
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+}
+.table .btn-group-sm {
+  > .btn,
+  > span > .btn {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border-width: 1px;
+
+    &:disabled {
+      opacity: 0.55;
+    }
+  }
+}
+@each $color, $value in $theme-colors {
+  .btn-light-#{$color} {
+    background: shift-color($value, $soft-bg-level);
+    color: $value;
+    border-color: shift-color($value, $soft-bg-level);
+    .material-icons-two-tone {
+      background-color: $value;
+    }
+    &:hover {
+      background: $value;
+      color: #fff;
+      border-color: $value;
+      .material-icons-two-tone {
+        background-color: #fff;
+      }
+    }
+    &.focus,
+    &:focus {
+      background: $value;
+      color: #fff;
+      border-color: $value;
+      .material-icons-two-tone {
+        background-color: #fff;
+      }
+    }
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):active,
+    .show > &.dropdown-toggle {
+      background: $value;
+      color: #fff;
+      border-color: $value;
+      .material-icons-two-tone {
+        background-color: #fff;
+      }
+    }
+  }
+  .btn-check:active,
+  .btn-check:checked {
+    + .btn-light-#{$color} {
+      background: $value;
+      color: #fff;
+      border-color: $value;
+      .material-icons-two-tone {
+        background-color: #fff;
+      }
+    }
+  }
+  .btn-link-#{$color} {
+    background: transparent;
+    color: $value;
+    border-color: transparent;
+    .material-icons-two-tone {
+      background-color: $value;
+    }
+    &:hover {
+      background: shift-color($value, $soft-bg-level);
+      color: $value;
+      border-color: shift-color($value, $soft-bg-level);
+    }
+    &.focus,
+    &:focus {
+      background: shift-color($value, $soft-bg-level);
+      color: $value;
+      border-color: shift-color($value, $soft-bg-level);
+    }
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):active,
+    .show > &.dropdown-toggle {
+      background: shift-color($value, $soft-bg-level);
+      color: $value;
+      border-color: shift-color($value, $soft-bg-level);
+    }
+  }
+  .btn-check:active,
+  .btn-check:checked {
+    + .btn-link-#{$color} {
+      background: shift-color($value, $soft-bg-level);
+      color: $value;
+      border-color: shift-color($value, $soft-bg-level);
+    }
+  }
+}

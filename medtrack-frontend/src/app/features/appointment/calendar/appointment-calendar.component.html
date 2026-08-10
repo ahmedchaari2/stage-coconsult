@@ -1,0 +1,94 @@
+<div class="appointment-calendar">
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-2 mb-3">
+    <div class="d-flex align-items-center gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-sm"
+        (click)="previousMonth()"
+        [attr.aria-label]="'appointment.calendar.previous' | transloco"
+      >
+        <i antIcon type="left" theme="outline"></i>
+      </button>
+      <h6 class="mb-0 flex-grow-1 calendar-month-label">{{ monthLabel() }}</h6>
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-sm"
+        (click)="nextMonth()"
+        [attr.aria-label]="'appointment.calendar.next' | transloco"
+      >
+        <i antIcon type="right" theme="outline"></i>
+      </button>
+    </div>
+    <button type="button" class="btn btn-outline-primary btn-sm" (click)="goToday()">
+      {{ 'appointment.calendar.today' | transloco }}
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center p-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="alert alert-danger" role="alert">
+      {{ error() }}
+      <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="loadMonth()">
+        {{ 'common.buttons.retry' | transloco }}
+      </button>
+    </div>
+  } @else {
+    <div class="calendar-grid">
+      <div class="calendar-weekdays">
+        @for (day of weekdayKeys; track day) {
+          <div class="calendar-weekday">{{ 'appointment.calendar.weekdays.' + day | transloco }}</div>
+        }
+      </div>
+      @for (week of weeks(); track $index) {
+        <div class="calendar-week">
+          @for (day of week; track day.key) {
+            <div
+              class="calendar-day"
+              [class.calendar-day-outside]="!day.inCurrentMonth || day.isSchedulingDisabled"
+              [class.calendar-day-today]="day.isToday"
+              [class.calendar-day-disabled]="day.isSchedulingDisabled"
+              [attr.aria-disabled]="day.isSchedulingDisabled ? true : null"
+              (click)="onDayClick(day)"
+            >
+              <div class="calendar-day-number">{{ day.date.getDate() }}</div>
+              <div class="calendar-day-appointments">
+                @for (appt of day.visibleAppointments; track appt.id) {
+                  <button
+                    type="button"
+                    class="calendar-appointment-chip"
+                    [ngbTooltip]="appt.motif"
+                    container="body"
+                    (click)="onAppointmentClick($event, appt)"
+                  >
+                    <span class="badge rounded-pill {{ statutBadgeClass(appt.statut) }}">
+                      <i
+                        antIcon
+                        [type]="statutIcon(appt.statut).type"
+                        [theme]="statutIcon(appt.statut).theme"
+                        class="me-1"
+                        role="img"
+                        [attr.aria-label]="'appointment.statut.' + appt.statut | transloco"
+                      ></i>
+                      {{ appt.dateHeure | timeFormat }}
+                    </span>
+                    <span class="calendar-appointment-name">{{ appt.patientNom }} {{ appt.patientPrenom }}</span>
+                  </button>
+                }
+                @if (day.additionalAppointmentCount > 0) {
+                  <button type="button" class="calendar-more-button" (click)="onMoreClick($event, day)">
+                    {{ 'appointment.calendar.more' | transloco: { count: day.additionalAppointmentCount } }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

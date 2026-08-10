@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+.search-box {
+  max-width: 320px;
+}
+
+.management-section-nav .nav-link {
+  min-height: 42px;
+}
+
+@media (max-width: 575.98px) {
+  .management-section-nav {
+    .nav,
+    .btn {
+      width: 100%;
+    }
+
+    .nav-link {
+      flex: 1;
+    }
+  }
+}

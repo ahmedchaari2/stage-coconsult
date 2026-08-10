@@ -1,0 +1,130 @@
+<div class="page-header">
+  <div class="page-block">
+    <div class="row align-items-center">
+      <div class="col-md-12">
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a [routerLink]="['/dashboard']" class="home">{{ 'nav.breadcrumbHome' | transloco }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <span class="f-14 f-w-600">{{ 'profile.view.title' | transloco }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <app-card [showHeader]="true" [cardTitle]="'profile.view.title' | transloco" [padding]="24">
+      @if (currentUser(); as user) {
+        <div class="row g-4 profile-layout">
+          <aside class="col-lg-3 profile-summary">
+            <app-profile-avatar />
+            <h5 class="mt-3 mb-1">{{ user.prenom }} {{ user.nom }}</h5>
+            <span
+              class="badge rounded-pill px-3 py-2"
+              [class.bg-secondary]="user.role === 'ADMIN'"
+              [class.bg-primary]="user.role !== 'ADMIN'"
+            >
+              {{ (user.role === 'ADMIN' ? 'profile.view.roles.admin' : 'profile.view.roles.medecin') | transloco }}
+            </span>
+          </aside>
+
+          <div class="col-lg-9">
+            <section class="profile-section">
+              <h6>{{ 'profile.view.sections.identity' | transloco }}</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <p class="field-label">{{ 'profile.edit.labels.prenom' | transloco }}</p>
+                  <p class="field-value">{{ user.prenom }}</p>
+                </div>
+                <div class="col-md-6">
+                  <p class="field-label">{{ 'profile.edit.labels.nom' | transloco }}</p>
+                  <p class="field-value">{{ user.nom }}</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="profile-section">
+              <h6>{{ 'profile.view.sections.contact' | transloco }}</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <p class="field-label">{{ 'profile.edit.labels.email' | transloco }}</p>
+                  <p class="field-value"><app-email-link [value]="user.email" /></p>
+                </div>
+                <div class="col-md-6">
+                  <p class="field-label">{{ 'profile.edit.labels.telephone' | transloco }}</p>
+                  <p class="field-value">
+                    @if (user.telephone) {
+                      <app-phone-link [value]="user.telephone" />
+                    } @else {
+                      —
+                    }
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            @if (user.role === 'MEDECIN') {
+              <section class="profile-section">
+                <h6>{{ 'profile.view.sections.professional' | transloco }}</h6>
+                @if (!user.specialite || !user.numeroOrdre) {
+                  <div class="alert alert-warning py-2" role="status">{{ 'profile.view.incompleteProfessionalProfile' | transloco }}</div>
+                }
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <p class="field-label">{{ 'profile.edit.labels.specialite' | transloco }}</p>
+                    <p class="field-value">{{ user.specialite || '—' }}</p>
+                  </div>
+                  <div class="col-md-6">
+                    <p class="field-label">{{ 'profile.edit.labels.numeroOrdre' | transloco }}</p>
+                    <p class="field-value">{{ user.numeroOrdre || '—' }}</p>
+                  </div>
+                </div>
+              </section>
+            }
+
+            <section class="profile-section mb-0">
+              <h6>{{ 'profile.view.sections.account' | transloco }}</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <p class="field-label">{{ 'profile.view.labels.role' | transloco }}</p>
+                  <p class="field-value">
+                    {{ (user.role === 'ADMIN' ? 'profile.view.roles.admin' : 'profile.view.roles.medecin') | transloco }}
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  <p class="field-label">{{ 'profile.view.labels.createdAt' | transloco }}</p>
+                  <p class="field-value">{{ user.createdAt ? (user.createdAt | dateFormat) : '—' }}</p>
+                </div>
+                @if (user.role === 'MEDECIN' && user.actif !== undefined) {
+                  <div class="col-md-6">
+                    <p class="field-label">{{ 'profile.view.labels.status' | transloco }}</p>
+                    <p class="field-value"><app-medecin-statut-badge [actif]="user.actif" /></p>
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-end gap-2 mt-4 pt-3 border-top">
+          <a [routerLink]="['/profile/edit']" fragment="security" class="btn btn-outline-primary">
+            {{ 'profile.view.changePasswordButton' | transloco }}
+          </a>
+          <a [routerLink]="['/profile/edit']" class="btn btn-primary">
+            {{ 'profile.view.editButton' | transloco }}
+          </a>
+        </div>
+      } @else {
+        <div class="alert alert-warning mb-0" role="alert">
+          {{ 'profile.view.noUser' | transloco }}
+          <a href="/auth/login" class="alert-link">{{ 'profile.view.reconnect' | transloco }}</a>
+          .
+        </div>
+      }
+    </app-card>
+  </div>
+</div>

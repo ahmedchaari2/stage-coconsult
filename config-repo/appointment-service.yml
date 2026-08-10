@@ -1,0 +1,10 @@
+# appointment-service publishes appointment events; exchange and routing keys are shared in application.yml.
+server:
+  port: 8084
+
+# Appointment slots use a fixed duration; times are quoted so YAML keeps them as strings.
+medtrack:
+  appointment:
+    duree-creneau-minutes: 30
+    heure-ouverture: "08:00"
+    heure-fermeture: "18:00"

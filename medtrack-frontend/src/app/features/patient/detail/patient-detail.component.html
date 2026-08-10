@@ -1,0 +1,339 @@
+<div class="page-header">
+  <div class="page-block">
+    <div class="row align-items-center">
+      <div class="col-md-12">
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a [routerLink]="['/dashboard']" class="home">{{ 'nav.breadcrumbHome' | transloco }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a [routerLink]="['/patients']" class="f-14 f-w-600">{{ 'nav.patients.list' | transloco }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <span class="f-14 f-w-600">{{ pageTitle ?? ('patient.detail.title' | transloco) }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <app-card [showHeader]="true" [cardTitle]="pageTitle ?? ('patient.detail.title' | transloco)" [padding]="24">
+      @if (error()) {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+          {{ error() }}
+          <button type="button" class="btn-close" (click)="error.set(null)" aria-label="Fermer"></button>
+        </div>
+      }
+
+      @if (isLoading()) {
+        <div class="text-center p-5">
+          <app-spinner [backgroundColor]="'var(--bs-primary)'" [spinner]="spinkit"></app-spinner>
+          <p class="mt-3 text-muted">{{ 'patient.form.loading' | transloco }}</p>
+        </div>
+      } @else if (patient(); as p) {
+        <div class="patient-detail">
+          @if (isArchived()) {
+            <div class="alert alert-secondary d-flex justify-content-between align-items-center mb-4" role="alert">
+              <span>
+                <i antIcon type="inbox" theme="outline" class="me-2"></i>
+                {{ 'patient.detail.archivedBanner' | transloco: { date: (p.archivedAt | dateFormat) } }}
+              </span>
+              @if (isAdmin()) {
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="onArchiveToggle()">
+                  <i antIcon type="rollback" theme="outline" class="me-1"></i>
+                  {{ 'common.buttons.restore' | transloco }}
+                </button>
+              }
+            </div>
+          }
+
+          <div class="clinical-banner alert alert-light border d-flex flex-wrap align-items-center mb-4" role="note">
+            @if (age() !== null) {
+              <span class="f-w-600">{{ age() }} {{ 'patient.detail.clinical.years' | transloco }}</span>
+            }
+            @if (medicalRecord(); as mr) {
+              <span class="clinical-banner-sep">·</span>
+              <span class="text-muted">{{ 'medicalRecord.fields.groupeSanguin' | transloco }}</span>
+              <span class="badge bg-danger-subtle text-danger f-14">{{ groupeSanguinLabel() }}</span>
+              <span class="clinical-banner-sep">·</span>
+              <span class="clinical-banner-allergy">
+                <i antIcon type="warning" theme="outline" class="me-1"></i>
+                {{ 'patient.detail.clinical.allergies' | transloco }} : {{ mr.allergies || ('patient.detail.clinical.allergiesNone' | transloco) }}
+              </span>
+            } @else {
+              <span class="clinical-banner-sep">·</span>
+              <span class="text-muted">
+                <i antIcon type="info-circle" theme="outline" class="me-1"></i>
+                {{ 'patient.detail.clinical.noData' | transloco }}
+              </span>
+            }
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-12">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  @if (p.numeroDossier) {
+                    <span class="badge bg-primary-subtle text-primary f-14">
+                      {{ 'patient.detail.numeroDossier' | transloco }} : {{ p.numeroDossier }}
+                    </span>
+                  }
+                </div>
+                <div class="btn-group btn-group-sm" role="group">
+                  @if (isAdmin()) {
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="onViewAccesLog()"
+                      [title]="'patient.detail.viewAccesLog' | transloco"
+                    >
+                      <i antIcon type="audit" theme="outline" class="me-1"></i>
+                      {{ 'patient.detail.viewAccesLog' | transloco }}
+                    </button>
+                  }
+                  @if (!isArchived()) {
+                    <button type="button" class="btn btn-outline-primary" (click)="onEdit()" [title]="'common.buttons.edit' | transloco">
+                      <i antIcon type="edit" theme="outline" class="me-1"></i>
+                      {{ 'common.buttons.edit' | transloco }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      (click)="onArchiveToggle()"
+                      [title]="'common.buttons.archive' | transloco"
+                    >
+                      <i antIcon type="inbox" theme="outline" class="me-1"></i>
+                      {{ 'common.buttons.archive' | transloco }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ul class="app-tab-nav nav nav-tabs patient-detail-tabs mb-4" role="tablist" [attr.aria-label]="'patient.detail.tabs.label' | transloco">
+            <li class="nav-item" role="presentation">
+              <button
+                #informationTab
+                type="button"
+                id="patient-information-tab"
+                class="nav-link"
+                role="tab"
+                [class.active]="activeTab() === 'information'"
+                [attr.aria-selected]="activeTab() === 'information'"
+                aria-controls="patient-information-panel"
+                (click)="setActiveTab('information')"
+                (keydown.arrowright)="setActiveTab('record'); recordTab.focus(); $event.preventDefault()"
+                (keydown.end)="setActiveTab('history'); historyTab.focus(); $event.preventDefault()"
+              >
+                <i antIcon type="info-circle" theme="outline" class="me-1"></i>
+                {{ 'patient.detail.sectionTitle' | transloco }}
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                #recordTab
+                type="button"
+                id="patient-record-tab"
+                class="nav-link"
+                role="tab"
+                [class.active]="activeTab() === 'record'"
+                [attr.aria-selected]="activeTab() === 'record'"
+                aria-controls="patient-record-panel"
+                (click)="setActiveTab('record')"
+                (keydown.arrowleft)="setActiveTab('information'); informationTab.focus(); $event.preventDefault()"
+                (keydown.arrowright)="setActiveTab('history'); historyTab.focus(); $event.preventDefault()"
+                (keydown.home)="setActiveTab('information'); informationTab.focus(); $event.preventDefault()"
+                (keydown.end)="setActiveTab('history'); historyTab.focus(); $event.preventDefault()"
+              >
+                <i antIcon type="medicine-box" theme="outline" class="me-1"></i>
+                {{ 'medicalRecord.sectionTitle' | transloco }}
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                #historyTab
+                type="button"
+                id="patient-history-tab"
+                class="nav-link"
+                role="tab"
+                [class.active]="activeTab() === 'history'"
+                [attr.aria-selected]="activeTab() === 'history'"
+                aria-controls="patient-history-panel"
+                (click)="setActiveTab('history')"
+                (keydown.arrowleft)="setActiveTab('record'); recordTab.focus(); $event.preventDefault()"
+                (keydown.home)="setActiveTab('information'); informationTab.focus(); $event.preventDefault()"
+              >
+                <i antIcon type="history" theme="outline" class="me-1"></i>
+                {{ 'patient.history.tab' | transloco }}
+              </button>
+            </li>
+          </ul>
+
+          @if (activeTab() === 'information') {
+            <section id="patient-information-panel" role="tabpanel" aria-labelledby="patient-information-tab">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.nom' | transloco }}</label>
+                  <p class="form-control-plaintext f-w-500">{{ p.nom }}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.prenom' | transloco }}</label>
+                  <p class="form-control-plaintext f-w-500">{{ p.prenom }}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.dateNaissance' | transloco }}</label>
+                  <p class="form-control-plaintext">{{ p.dateNaissance | dateFormat }}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.telephone' | transloco }}</label>
+                  <p class="form-control-plaintext">
+                    @if (p.telephone) {
+                      <app-phone-link [value]="p.telephone" />
+                    } @else {
+                      —
+                    }
+                  </p>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.email' | transloco }}</label>
+                  <p class="form-control-plaintext">
+                    @if (p.email) {
+                      <app-email-link [value]="p.email" />
+                    } @else {
+                      —
+                    }
+                  </p>
+                </div>
+
+                @if (isAdmin()) {
+                  <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">{{ 'patient.form.labels.medecinReferent' | transloco }}</label>
+                    <p class="form-control-plaintext">{{ medecinReferentDisplay() }}</p>
+                  </div>
+                }
+
+                <div class="col-md-6">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.sexe' | transloco }}</label>
+                  <p class="form-control-plaintext">{{ p.sexe ? ('patient.form.sexeValues.' + p.sexe | transloco) : '—' }}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.cin' | transloco }}</label>
+                  <p class="form-control-plaintext">{{ p.cin || '—' }}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.numeroAssurance' | transloco }}</label>
+                  <p class="form-control-plaintext">{{ p.numeroAssurance || '—' }}</p>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label text-muted mb-1">{{ 'patient.form.labels.adresse' | transloco }}</label>
+                  <p class="form-control-plaintext">{{ p.adresse }}</p>
+                </div>
+              </div>
+
+              @if (p.contactUrgenceNom || p.contactUrgenceTelephone) {
+                <hr class="my-3" />
+                <h6 class="mb-3">{{ 'patient.form.emergencyContact.title' | transloco }}</h6>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">{{ 'patient.form.emergencyContact.nom' | transloco }}</label>
+                    <p class="form-control-plaintext">{{ p.contactUrgenceNom || '—' }}</p>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-muted mb-1">{{ 'patient.form.emergencyContact.telephone' | transloco }}</label>
+                    <p class="form-control-plaintext">
+                      @if (p.contactUrgenceTelephone) {
+                        <app-phone-link [value]="p.contactUrgenceTelephone" />
+                      } @else {
+                        —
+                      }
+                    </p>
+                  </div>
+                </div>
+              }
+            </section>
+          }
+
+          <section id="patient-record-panel" role="tabpanel" aria-labelledby="patient-record-tab" [hidden]="activeTab() !== 'record'">
+            <app-medical-record
+              [patientId]="p.id"
+              [canEdit]="canEditMedicalRecord()"
+              [medecins]="medecins()"
+              [prefillConsultation]="consultationPrefill()"
+              [targetConsultationId]="targetConsultationId()"
+              (recordLoaded)="onRecordLoaded($event)"
+              (prefillConsumed)="consultationPrefill.set(null)"
+              (targetConsultationFailed)="onTargetConsultationFailed()"
+            />
+          </section>
+
+          @if (activeTab() === 'history') {
+            <section id="patient-history-panel" role="tabpanel" aria-labelledby="patient-history-tab">
+              <app-patient-history [patientId]="p.id" [medecins]="medecins()" />
+            </section>
+          }
+
+          <app-patient-ai-chat [patientId]="p.id" />
+        </div>
+      } @else {
+        <div class="text-center p-5">
+          <i class="anticon anticon-file-text f-48 text-muted mb-3"></i>
+          <h5 class="text-muted">{{ 'patient.list.empty.title' | transloco }}</h5>
+          <p class="text-muted">{{ 'patient.detail.empty.text' | transloco }}</p>
+          <button type="button" class="btn btn-primary mt-2" (click)="onBack()">
+            <i class="anticon anticon-left me-1"></i>
+            {{ 'common.buttons.backToList' | transloco }}
+          </button>
+        </div>
+      }
+    </app-card>
+  </div>
+</div>
+
+<ng-template #confirmModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (pendingAction === 'restore' ? 'patient.list.restoreModal.title' : 'patient.list.archiveModal.title') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    @if (pendingAction === 'restore') {
+      {{ 'patient.list.restoreModal.bodyBefore' | transloco }}
+      <strong>{{ pendingPatient?.nom }} {{ pendingPatient?.prenom }}</strong>
+      {{ 'patient.list.restoreModal.bodyAfter' | transloco }}
+    } @else {
+      {{ 'patient.list.archiveModal.bodyBefore' | transloco }}
+      <strong>{{ pendingPatient?.nom }} {{ pendingPatient?.prenom }}</strong>
+      {{ 'patient.list.archiveModal.bodyAfter' | transloco }}
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    @if (pendingAction === 'restore') {
+      <button type="button" class="btn btn-success" (click)="modal.close('confirm')">
+        <i antIcon type="rollback" theme="outline" class="me-1"></i>
+        {{ 'common.buttons.restore' | transloco }}
+      </button>
+    } @else {
+      <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">
+        <i antIcon type="inbox" theme="outline" class="me-1"></i>
+        {{ 'common.buttons.archive' | transloco }}
+      </button>
+    }
+  </div>
+</ng-template>
+
+<app-patient-edit-modal [medecins]="medecins()" (saved)="onPatientSaved($event)" />

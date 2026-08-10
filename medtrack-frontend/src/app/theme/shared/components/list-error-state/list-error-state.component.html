@@ -1,0 +1,6 @@
+<div class="alert alert-danger m-3" role="alert">
+  {{ message() }}
+  <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="retry.emit()">
+    {{ 'common.buttons.retry' | transloco }}
+  </button>
+</div>

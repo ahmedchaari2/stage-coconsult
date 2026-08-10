@@ -1,0 +1,11 @@
+<nav>
+  <div class="navbar-wrapper">
+    <div class="m-header">
+      <a [routerLink]="['/dashboard']" class="b-brand app-brand">
+        <span class="app-brand-mark" aria-hidden="true">+</span>
+        <span class="app-brand-name">Medtrack</span>
+      </a>
+    </div>
+    <app-nav-content (NavCollapsedMob)="navCollapseMob()" (SubmenuCollapse)="navSubmenuCollapse()" class="scroll-div w-100 compact" />
+  </div>
+</nav>

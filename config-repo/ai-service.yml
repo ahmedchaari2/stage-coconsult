@@ -1,0 +1,38 @@
+# ai-service aggregates patient context through Feign and then queries Gemini.
+server:
+  port: 8088
+
+gemini:
+  api-key: ${GEMINI_API_KEY:AQ.Ab8RN6L6LxwD9GCwdBNec813x7vaDvCfdVINRAgmLqUbIUzdnQ}
+  model: ${GEMINI_MODEL:gemini-flash-latest}
+  timeout-seconds: 25
+
+medtrack:
+  ai:
+    cache-ttl-seconds: 120
+    session-ttl-minutes: 30
+    session-max-turns: 6
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      patientService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      medicalRecordService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      appointmentService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      prescriptionService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      geminiApi:
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s

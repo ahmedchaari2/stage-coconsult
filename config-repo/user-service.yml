@@ -1,0 +1,38 @@
+# user-service is the only JWT issuer.
+server:
+  port: 8082
+
+jwt:
+  access-token-expiration-minutes: 15
+  refresh-token-expiration-days: 180
+
+# Keep cookie.secure false for local HTTP; production must override it to true.
+cookie:
+  secure: false
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ahmedchaari81@gmail.com
+    password: "${MAIL_PASSWORD:ijzz cyfy qkhp vjoe}"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  servlet:
+    multipart:
+      # Parser limit stays above the business limit so the service can return its own error.
+      max-file-size: 3MB
+      max-request-size: 4MB
+
+medtrack:
+  mail:
+    from: ahmedchaari81@gmail.com
+  frontend:
+    url: http://localhost:4200
+  uploads:
+    profile-photos:
+      dir: ./uploads/profile-photos

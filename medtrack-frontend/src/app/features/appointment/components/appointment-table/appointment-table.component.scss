@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.appointment-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 0.25rem;
+}
+
+.appointment-edit-action {
+  margin-left: 0.25rem;
+}

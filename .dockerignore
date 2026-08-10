@@ -1,0 +1,10 @@
+# Applies to backend build contexts (repo root and each service directory).
+**/target
+**/uploads
+**/.git
+**/.idea
+**/.vscode
+**/*.log
+medtrack-frontend/node_modules
+medtrack-frontend/dist
+medtrack-frontend/.angular

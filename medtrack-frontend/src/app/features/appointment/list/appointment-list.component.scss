@@ -1,0 +1,20 @@
+:host {
+  display: block;
+}
+.appointment-creneaux {
+  max-height: 9rem;
+  overflow-y: auto;
+}
+
+.appointment-patient-results {
+  position: absolute;
+  z-index: 1055; // au-dessus du contenu du modal (backdrop NgbModal ~1050-1055)
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 12rem;
+  overflow-y: auto;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background-color: var(--bs-body-bg);
+}

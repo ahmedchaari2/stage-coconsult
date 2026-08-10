@@ -1,0 +1,378 @@
+<div class="row">
+  <div class="col-12">
+    <app-card [showHeader]="true" [cardTitle]="'patient.list.title' | transloco" [padding]="0">
+      <div class="p-3 border-bottom">
+        <div class="d-flex flex-wrap justify-content-end mb-3">
+          <button type="button" class="btn btn-primary btn-sm text-nowrap" (click)="onCreate()">
+            <i antIcon type="plus" theme="outline" class="me-1"></i>
+            {{ 'patient.list.addButton' | transloco }}
+          </button>
+        </div>
+        <app-advanced-filters
+          [(panelOpen)]="filtersPanelOpen"
+          [quickSearchValue]="searchInput()"
+          (quickSearchValueChange)="searchInput.set($event)"
+          (quickSearchDebounced)="onSearchChange($event)"
+          [activeFilterCount]="activeFilterCount()"
+          [chips]="filterChips()"
+          (chipRemove)="onFilterChipRemove($event)"
+          (resetAll)="onResetAllFilters()"
+          (applyRequested)="onApplyPanelFilters()"
+        >
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">{{ 'patient.list.filters.nomLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="nomInput()"
+                (ngModelChange)="nomInput.set($event)"
+                appDebounceInput
+                (debouncedInput)="onNomFilterChange($event)"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'patient.list.filters.prenomLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="prenomInput()"
+                (ngModelChange)="prenomInput.set($event)"
+                appDebounceInput
+                (debouncedInput)="onPrenomFilterChange($event)"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'patient.list.filters.numeroDossierLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="numeroDossierInput()"
+                (ngModelChange)="numeroDossierInput.set($event)"
+                appDebounceInput
+                (debouncedInput)="onNumeroDossierFilterChange($event)"
+                [placeholder]="'patient.list.filters.numeroDossierPlaceholder' | transloco"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'patient.list.filters.telephoneLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="telephoneInput()"
+                (ngModelChange)="telephoneInput.set($event)"
+                appDebounceInput
+                (debouncedInput)="onTelephoneFilterChange($event)"
+                [placeholder]="'patient.list.filters.telephonePlaceholder' | transloco"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'patient.list.filters.dateNaissanceFromLabel' | transloco }}</label>
+              <app-date-input
+                size="sm"
+                [ngModel]="dateNaissanceFromFilter()"
+                (ngModelChange)="onDateNaissanceFromChange($event)"
+                [minDate]="oldestBirthDate"
+                [maxDate]="dateNaissanceToFilter() || today"
+                [invalid]="dateNaissanceRangeInvalid()"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'patient.list.filters.dateNaissanceToLabel' | transloco }}</label>
+              <app-date-input
+                size="sm"
+                [ngModel]="dateNaissanceToFilter()"
+                (ngModelChange)="onDateNaissanceToChange($event)"
+                [minDate]="dateNaissanceFromFilter() || oldestBirthDate"
+                [maxDate]="today"
+                [invalid]="dateNaissanceRangeInvalid()"
+              />
+              @if (dateNaissanceRangeInvalid()) {
+                <div class="form-text text-danger">{{ 'common.filters.dateRangeInvalid' | transloco }}</div>
+              }
+            </div>
+            @if (isAdmin()) {
+              <div class="col-md-3">
+                <label class="form-label">{{ 'patient.list.filters.medecinReferentLabel' | transloco }}</label>
+                <select
+                  class="form-select form-select-sm"
+                  [ngModel]="medecinReferentIdFilter()"
+                  (ngModelChange)="onMedecinReferentFilterChange($event)"
+                >
+                  <option [ngValue]="null">{{ 'patient.list.filters.medecinReferentAll' | transloco }}</option>
+                  @for (m of medecins(); track m.id) {
+                    <option [ngValue]="m.id">{{ m.nom }} {{ m.prenom }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check form-switch mb-1">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="includeArchivedFilter"
+                    [ngModel]="includeArchivedFilter()"
+                    (ngModelChange)="onIncludeArchivedFilterChange($event)"
+                  />
+                  <label class="form-check-label" for="includeArchivedFilter">
+                    {{ 'patient.list.filters.includeArchivedLabel' | transloco }}
+                  </label>
+                </div>
+              </div>
+            }
+          </div>
+        </app-advanced-filters>
+      </div>
+      <div class="table-responsive">
+        <app-patient-table
+          [patients]="patients()"
+          [isLoading]="isLoading()"
+          [error]="error()"
+          [searchTerm]="searchTerm()"
+          [canRestoreArchived]="isAdmin()"
+          [isAdmin]="isAdmin()"
+          [medecinReferentLabel]="patientMedecinReferentLabel"
+          [page]="page()"
+          [totalPages]="totalPages()"
+          [totalElements]="totalElements()"
+          [size]="size()"
+          [sortState]="sortState()"
+          (editRequested)="onEdit($event)"
+          (archiveToggleRequested)="onArchiveToggle($event)"
+          (retryRequested)="loadPatients()"
+          (resetSearchRequested)="onResetSearch()"
+          (pageChange)="onPageChange($event)"
+          (sizeChange)="onSizeChange($event)"
+          (sortChange)="onSortChange($event)"
+        />
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<ng-template #confirmModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (pendingAction === 'restore' ? 'patient.list.restoreModal.title' : 'patient.list.archiveModal.title') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    @if (pendingAction === 'restore') {
+      {{ 'patient.list.restoreModal.bodyBefore' | transloco }}
+      <strong>{{ pendingPatient?.nom }} {{ pendingPatient?.prenom }}</strong>
+      {{ 'patient.list.restoreModal.bodyAfter' | transloco }}
+    } @else {
+      {{ 'patient.list.archiveModal.bodyBefore' | transloco }}
+      <strong>{{ pendingPatient?.nom }} {{ pendingPatient?.prenom }}</strong>
+      {{ 'patient.list.archiveModal.bodyAfter' | transloco }}
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    @if (pendingAction === 'restore') {
+      <button type="button" class="btn btn-success" (click)="modal.close('confirm')">
+        <i antIcon type="rollback" theme="outline" class="me-1"></i>
+        {{ 'common.buttons.restore' | transloco }}
+      </button>
+    } @else {
+      <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">
+        <i antIcon type="inbox" theme="outline" class="me-1"></i>
+        {{ 'common.buttons.archive' | transloco }}
+      </button>
+    }
+  </div>
+</ng-template>
+
+<ng-template #createModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'patient.form.createTitle' | transloco }}</h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <form [formGroup]="createForm" (ngSubmit)="onSubmitCreate(modal)" novalidate>
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="createNom" class="form-label required">{{ 'patient.form.labels.nom' | transloco }}</label>
+          <input
+            type="text"
+            id="createNom"
+            class="form-control"
+            formControlName="nom"
+            [placeholder]="'patient.form.placeholders.nom' | transloco"
+            [class.is-invalid]="hasCreateError('nom')"
+          />
+          @if (hasCreateError('nom')) {
+            <div class="invalid-feedback">{{ 'patient.form.errors.nomRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="createPrenom" class="form-label required">{{ 'patient.form.labels.prenom' | transloco }}</label>
+          <input
+            type="text"
+            id="createPrenom"
+            class="form-control"
+            formControlName="prenom"
+            [placeholder]="'patient.form.placeholders.prenom' | transloco"
+            [class.is-invalid]="hasCreateError('prenom')"
+          />
+          @if (hasCreateError('prenom')) {
+            <div class="invalid-feedback">{{ 'patient.form.errors.prenomRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="createDateNaissance" class="form-label required">{{ 'patient.form.labels.dateNaissance' | transloco }}</label>
+          <app-date-input
+            inputId="createDateNaissance"
+            formControlName="dateNaissance"
+            [minDate]="minBirthDate"
+            [maxDate]="today"
+            [invalid]="hasCreateError('dateNaissance')"
+          />
+          @if (hasCreateError('dateNaissance', 'futureDate')) {
+            <div class="invalid-feedback d-block">{{ 'patient.form.errors.dateNaissanceFuture' | transloco }}</div>
+          } @else if (hasCreateError('dateNaissance')) {
+            <div class="invalid-feedback d-block">{{ 'patient.form.errors.dateNaissanceRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="createTelephone" class="form-label required">{{ 'patient.form.labels.telephone' | transloco }}</label>
+          <input
+            type="tel"
+            id="createTelephone"
+            class="form-control"
+            formControlName="telephone"
+            [placeholder]="'patient.form.placeholders.telephone' | transloco"
+            [class.is-invalid]="hasCreateError('telephone')"
+          />
+          @if (hasCreateError('telephone', 'pattern')) {
+            <div class="invalid-feedback">{{ 'patient.form.errors.telephoneInvalid' | transloco }}</div>
+          } @else if (hasCreateError('telephone')) {
+            <div class="invalid-feedback">{{ 'patient.form.errors.telephoneRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="createEmail" class="form-label required">{{ 'patient.form.labels.email' | transloco }}</label>
+          <input
+            type="email"
+            id="createEmail"
+            class="form-control"
+            formControlName="email"
+            [placeholder]="'patient.form.placeholders.email' | transloco"
+            [class.is-invalid]="hasCreateError('email')"
+          />
+          @if (hasCreateError('email', 'email')) {
+            <div class="invalid-feedback">{{ 'patient.form.errors.emailInvalid' | transloco }}</div>
+          } @else if (hasCreateError('email')) {
+            <div class="invalid-feedback">{{ 'patient.form.errors.emailRequired' | transloco }}</div>
+          }
+        </div>
+
+        @if (isAdmin()) {
+          <div class="col-md-6">
+            <label for="createMedecinReferentId" class="form-label">{{ 'patient.form.labels.medecinReferent' | transloco }}</label>
+            <select id="createMedecinReferentId" class="form-select" formControlName="medecinReferentId" [compareWith]="compareMedecinById">
+              <option [ngValue]="null">{{ 'patient.form.placeholders.medecinNone' | transloco }}</option>
+              @for (m of medecins(); track m.id) {
+                <option [ngValue]="m.id">{{ m.nom }} {{ m.prenom }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <div class="col-12">
+          <label for="createAdresse" class="form-label required">{{ 'patient.form.labels.adresse' | transloco }}</label>
+          <textarea
+            id="createAdresse"
+            class="form-control"
+            formControlName="adresse"
+            rows="2"
+            [placeholder]="'patient.form.placeholders.adresse' | transloco"
+            [class.is-invalid]="hasCreateError('adresse')"
+          ></textarea>
+          @if (hasCreateError('adresse')) {
+            <div class="invalid-feedback">{{ 'patient.form.errors.adresseRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-4">
+          <label for="createSexe" class="form-label">{{ 'patient.form.labels.sexe' | transloco }}</label>
+          <select id="createSexe" class="form-select" formControlName="sexe">
+            <option [ngValue]="null">{{ 'patient.form.placeholders.sexeNone' | transloco }}</option>
+            @for (s of sexeOptions; track s) {
+              <option [ngValue]="s">{{ 'patient.form.sexeValues.' + s | transloco }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="createCin" class="form-label">{{ 'patient.form.labels.cin' | transloco }}</label>
+          <input
+            type="text"
+            id="createCin"
+            class="form-control"
+            formControlName="cin"
+            [placeholder]="'patient.form.placeholders.cin' | transloco"
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="createNumeroAssurance" class="form-label">{{ 'patient.form.labels.numeroAssurance' | transloco }}</label>
+          <input
+            type="text"
+            id="createNumeroAssurance"
+            class="form-control"
+            formControlName="numeroAssurance"
+            [placeholder]="'patient.form.placeholders.numeroAssurance' | transloco"
+          />
+        </div>
+
+        <div class="col-12">
+          <hr class="my-2" />
+          <h6 class="text-muted mb-2">{{ 'patient.form.emergencyContact.title' | transloco }}</h6>
+        </div>
+        <div class="col-md-6">
+          <label for="createContactUrgenceNom" class="form-label">{{ 'patient.form.emergencyContact.nom' | transloco }}</label>
+          <input
+            type="text"
+            id="createContactUrgenceNom"
+            class="form-control"
+            formControlName="contactUrgenceNom"
+            [placeholder]="'patient.form.emergencyContact.nomPlaceholder' | transloco"
+          />
+        </div>
+        <div class="col-md-6">
+          <label for="createContactUrgenceTelephone" class="form-label">{{ 'patient.form.emergencyContact.telephone' | transloco }}</label>
+          <input
+            type="tel"
+            id="createContactUrgenceTelephone"
+            class="form-control"
+            formControlName="contactUrgenceTelephone"
+            [placeholder]="'patient.form.emergencyContact.telephonePlaceholder' | transloco"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.cancel' | transloco }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isCreateSubmitting()">
+        @if (isCreateSubmitting()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ 'patient.form.submitting' | transloco }}
+        } @else {
+          <i class="anticon anticon-save me-1"></i>
+          {{ 'patient.form.submitCreate' | transloco }}
+        }
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<app-patient-edit-modal [medecins]="medecins()" (saved)="onPatientSaved()" />

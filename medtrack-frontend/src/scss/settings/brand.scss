@@ -1,0 +1,30 @@
+// Marque textuelle "+ Medtrack", partagée entre la sidebar admin (navigation.component) et
+// le shell des écrans publics (guest-layout.component) : un seul endroit à modifier si la
+// marque change.
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.app-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 0.45rem;
+  background-color: var(--bs-primary);
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.app-brand-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--bs-heading-color, var(--bs-body-color));
+}

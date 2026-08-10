@@ -1,0 +1,243 @@
+<div class="page-header">
+  <div class="page-block">
+    <div class="row align-items-center">
+      <div class="col-md-12">
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a [routerLink]="['/dashboard']" class="home">{{ 'nav.breadcrumbHome' | transloco }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a [routerLink]="['/profile/view']" class="f-14 f-w-600">{{ 'profile.view.title' | transloco }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <span class="f-14 f-w-600">{{ 'profile.edit.title' | transloco }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="profile-subnav app-tab-nav nav nav-tabs" [attr.aria-label]="'profile.edit.tabs.label' | transloco">
+  <a
+    class="nav-link"
+    [class.active]="activeSection() === 'profile'"
+    [routerLink]="['/profile/edit']"
+    [attr.aria-current]="activeSection() === 'profile' ? 'page' : null"
+  >
+    <i class="anticon anticon-user me-1" aria-hidden="true"></i>
+    {{ 'profile.edit.tabs.profile' | transloco }}
+  </a>
+  <a
+    class="nav-link"
+    [class.active]="activeSection() === 'security'"
+    [routerLink]="['/profile/edit']"
+    fragment="security"
+    [attr.aria-current]="activeSection() === 'security' ? 'page' : null"
+  >
+    <i class="anticon anticon-lock me-1" aria-hidden="true"></i>
+    {{ 'profile.edit.tabs.security' | transloco }}
+  </a>
+</nav>
+
+@if (activeSection() === 'profile') {
+  <div class="row">
+    <div class="col-12">
+      <app-card [showHeader]="true" [cardTitle]="'profile.edit.title' | transloco" [padding]="24">
+        <div class="mb-4">
+          <app-profile-avatar />
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="nom" class="form-label required">{{ 'profile.edit.labels.nom' | transloco }}</label>
+              <input
+                type="text"
+                id="nom"
+                class="form-control"
+                formControlName="nom"
+                [placeholder]="'profile.edit.placeholders.nom' | transloco"
+                [class.is-invalid]="hasError('nom')"
+              />
+              @if (hasError('nom')) {
+                <div class="invalid-feedback">{{ getErrorMessage('nom') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label for="prenom" class="form-label required">{{ 'profile.edit.labels.prenom' | transloco }}</label>
+              <input
+                type="text"
+                id="prenom"
+                class="form-control"
+                formControlName="prenom"
+                [placeholder]="'profile.edit.placeholders.prenom' | transloco"
+                [class.is-invalid]="hasError('prenom')"
+              />
+              @if (hasError('prenom')) {
+                <div class="invalid-feedback">{{ getErrorMessage('prenom') }}</div>
+              }
+            </div>
+
+            <div class="col-12">
+              <label for="email" class="form-label required">{{ 'profile.edit.labels.email' | transloco }}</label>
+              <input
+                type="email"
+                id="email"
+                class="form-control"
+                formControlName="email"
+                [placeholder]="'profile.edit.placeholders.email' | transloco"
+                [class.is-invalid]="hasError('email') || emailConflict()"
+              />
+              @if (emailConflict()) {
+                <div class="invalid-feedback d-block">{{ 'profile.edit.emailTaken' | transloco }}</div>
+              } @else if (hasError('email')) {
+                <div class="invalid-feedback">{{ getErrorMessage('email') }}</div>
+              }
+            </div>
+
+            <div class="col-12">
+              <label for="telephone" class="form-label">{{ 'profile.edit.labels.telephone' | transloco }}</label>
+              <input
+                type="tel"
+                id="telephone"
+                class="form-control"
+                formControlName="telephone"
+                autocomplete="tel"
+                [placeholder]="'profile.edit.placeholders.telephone' | transloco"
+                [class.is-invalid]="hasError('telephone')"
+              />
+              @if (hasError('telephone')) {
+                <div class="invalid-feedback">{{ 'profile.validation.telephone' | transloco }}</div>
+              }
+            </div>
+
+            @if (isMedecin) {
+              <div class="col-12 mt-4">
+                <h6 class="section-title">{{ 'profile.view.sections.professional' | transloco }}</h6>
+              </div>
+
+              <div class="col-md-6">
+                <label for="specialite" class="form-label">{{ 'profile.edit.labels.specialite' | transloco }}</label>
+                <input
+                  type="text"
+                  id="specialite"
+                  class="form-control"
+                  formControlName="specialite"
+                  [placeholder]="'profile.edit.placeholders.specialite' | transloco"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label for="numeroOrdre" class="form-label">{{ 'profile.edit.labels.numeroOrdre' | transloco }}</label>
+                <input
+                  type="text"
+                  id="numeroOrdre"
+                  class="form-control"
+                  formControlName="numeroOrdre"
+                  [placeholder]="'profile.edit.placeholders.numeroOrdre' | transloco"
+                />
+              </div>
+            }
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-12 d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">
+                {{ 'common.buttons.cancel' | transloco }}
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isSubmitting()">
+                @if (isSubmitting()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                }
+                {{ 'common.buttons.save' | transloco }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </app-card>
+    </div>
+  </div>
+}
+
+@if (activeSection() === 'security') {
+  <div id="security" class="row">
+    <div class="col-12">
+      <app-card [showHeader]="true" [cardTitle]="'profile.security.title' | transloco" [padding]="24">
+        <form [formGroup]="passwordForm" (ngSubmit)="onSubmitPassword()" novalidate>
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="currentPassword" class="form-label required">{{ 'profile.security.currentPasswordLabel' | transloco }}</label>
+              <input
+                type="password"
+                id="currentPassword"
+                class="form-control"
+                formControlName="currentPassword"
+                [placeholder]="'profile.security.currentPasswordPlaceholder' | transloco"
+                [class.is-invalid]="hasPasswordError('currentPassword') || currentPasswordInvalid()"
+              />
+              @if (currentPasswordInvalid()) {
+                <div class="invalid-feedback d-block">{{ 'profile.security.currentPasswordInvalid' | transloco }}</div>
+              } @else if (hasPasswordError('currentPassword')) {
+                <div class="invalid-feedback">{{ 'profile.security.currentPasswordRequired' | transloco }}</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label for="newPassword" class="form-label required">{{ 'profile.security.newPasswordLabel' | transloco }}</label>
+              <input
+                type="password"
+                id="newPassword"
+                class="form-control"
+                formControlName="newPassword"
+                [placeholder]="'profile.security.newPasswordPlaceholder' | transloco"
+                [class.is-invalid]="hasPasswordError('newPassword')"
+              />
+              @if (hasPasswordError('newPassword')) {
+                <div class="invalid-feedback">
+                  @if (passwordForm.get('newPassword')?.errors?.['required']) {
+                    <div>{{ 'profile.security.newPasswordRequired' | transloco }}</div>
+                  }
+                  @if (passwordForm.get('newPassword')?.errors?.['minlength']) {
+                    <div>{{ 'profile.security.newPasswordMinLength' | transloco }}</div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label for="confirmNewPassword" class="form-label required">{{ 'profile.security.confirmPasswordLabel' | transloco }}</label>
+              <input
+                type="password"
+                id="confirmNewPassword"
+                class="form-control"
+                formControlName="confirmPassword"
+                [placeholder]="'profile.security.confirmPasswordPlaceholder' | transloco"
+                [class.is-invalid]="
+                  hasPasswordError('confirmPassword') || (passwordForm.get('confirmPassword')?.touched && isNewPasswordMismatch())
+                "
+              />
+              @if (hasPasswordError('confirmPassword') && passwordForm.get('confirmPassword')?.errors?.['required']) {
+                <div class="invalid-feedback">{{ 'profile.security.confirmPasswordRequired' | transloco }}</div>
+              } @else if (passwordForm.get('confirmPassword')?.touched && isNewPasswordMismatch()) {
+                <div class="invalid-feedback d-block">{{ 'profile.security.passwordMismatch' | transloco }}</div>
+              }
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-12 d-flex justify-content-end gap-2">
+              <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid || isSubmittingPassword()">
+                @if (isSubmittingPassword()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                }
+                {{ 'profile.security.submit' | transloco }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </app-card>
+    </div>
+  </div>
+}

@@ -1,0 +1,36 @@
+# dashboard-service aggregates data from other services via Feign.
+server:
+  port: 8087
+
+# Slot settings are aligned with appointment-service for occupancy calculations.
+medtrack:
+  dashboard:
+    occupation:
+      heure-ouverture: "08:00"
+      heure-fermeture: "18:00"
+      duree-creneau-minutes: 30
+
+# One circuit breaker per source service keeps a failed section isolated.
+resilience4j:
+  circuitbreaker:
+    instances:
+      appointmentService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      patientService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      prescriptionService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      medicalRecordService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      userService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s

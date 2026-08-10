@@ -1,0 +1,185 @@
+<ng-template #editModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'patient.form.editTitle' | transloco }}</h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <form [formGroup]="editForm" (ngSubmit)="onSubmit(modal)" novalidate>
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="editNom" class="form-label required">{{ 'patient.form.labels.nom' | transloco }}</label>
+          <input
+            type="text"
+            id="editNom"
+            class="form-control"
+            formControlName="nom"
+            [placeholder]="'patient.form.placeholders.nom' | transloco"
+            [class.is-invalid]="hasError('nom')"
+          />
+          @if (hasError('nom')) {
+          <div class="invalid-feedback">{{ 'patient.form.errors.nomRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="editPrenom" class="form-label required">{{ 'patient.form.labels.prenom' | transloco }}</label>
+          <input
+            type="text"
+            id="editPrenom"
+            class="form-control"
+            formControlName="prenom"
+            [placeholder]="'patient.form.placeholders.prenom' | transloco"
+            [class.is-invalid]="hasError('prenom')"
+          />
+          @if (hasError('prenom')) {
+          <div class="invalid-feedback">{{ 'patient.form.errors.prenomRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="editDateNaissance" class="form-label required">{{ 'patient.form.labels.dateNaissance' | transloco }}</label>
+          <app-date-input
+            inputId="editDateNaissance"
+            formControlName="dateNaissance"
+            [minDate]="minBirthDate"
+            [maxDate]="today"
+            [invalid]="hasError('dateNaissance')"
+          />
+          @if (hasError('dateNaissance', 'futureDate')) {
+          <div class="invalid-feedback d-block">{{ 'patient.form.errors.dateNaissanceFuture' | transloco }}</div>
+          } @else if (hasError('dateNaissance')) {
+          <div class="invalid-feedback d-block">{{ 'patient.form.errors.dateNaissanceRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="editTelephone" class="form-label required">{{ 'patient.form.labels.telephone' | transloco }}</label>
+          <input
+            type="tel"
+            id="editTelephone"
+            class="form-control"
+            formControlName="telephone"
+            [placeholder]="'patient.form.placeholders.telephone' | transloco"
+            [class.is-invalid]="hasError('telephone')"
+          />
+          @if (hasError('telephone', 'pattern')) {
+          <div class="invalid-feedback">{{ 'patient.form.errors.telephoneInvalid' | transloco }}</div>
+          } @else if (hasError('telephone')) {
+          <div class="invalid-feedback">{{ 'patient.form.errors.telephoneRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="editEmail" class="form-label required">{{ 'patient.form.labels.email' | transloco }}</label>
+          <input
+            type="email"
+            id="editEmail"
+            class="form-control"
+            formControlName="email"
+            [placeholder]="'patient.form.placeholders.email' | transloco"
+            [class.is-invalid]="hasError('email')"
+          />
+          @if (hasError('email', 'email')) {
+          <div class="invalid-feedback">{{ 'patient.form.errors.emailInvalid' | transloco }}</div>
+          } @else if (hasError('email')) {
+          <div class="invalid-feedback">{{ 'patient.form.errors.emailRequired' | transloco }}</div>
+          }
+        </div>
+
+        @if (isAdmin()) {
+        <div class="col-md-6">
+          <label for="editMedecinReferentId" class="form-label">{{ 'patient.form.labels.medecinReferent' | transloco }}</label>
+          <select id="editMedecinReferentId" class="form-select" formControlName="medecinReferentId" [compareWith]="compareMedecinById">
+            <option [ngValue]="null">{{ 'patient.form.placeholders.medecinNone' | transloco }}</option>
+            @for (m of medecins(); track m.id) {
+            <option [ngValue]="m.id">{{ m.nom }} {{ m.prenom }}</option>
+            }
+          </select>
+        </div>
+        }
+
+        <div class="col-12">
+          <label for="editAdresse" class="form-label required">{{ 'patient.form.labels.adresse' | transloco }}</label>
+          <textarea
+            id="editAdresse"
+            class="form-control"
+            formControlName="adresse"
+            rows="2"
+            [placeholder]="'patient.form.placeholders.adresse' | transloco"
+            [class.is-invalid]="hasError('adresse')"
+          ></textarea>
+          @if (hasError('adresse')) {
+          <div class="invalid-feedback">{{ 'patient.form.errors.adresseRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-4">
+          <label for="editSexe" class="form-label">{{ 'patient.form.labels.sexe' | transloco }}</label>
+          <select id="editSexe" class="form-select" formControlName="sexe">
+            <option [ngValue]="null">{{ 'patient.form.placeholders.sexeNone' | transloco }}</option>
+            @for (s of sexeOptions; track s) {
+            <option [ngValue]="s">{{ 'patient.form.sexeValues.' + s | transloco }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="editCin" class="form-label">{{ 'patient.form.labels.cin' | transloco }}</label>
+          <input
+            type="text"
+            id="editCin"
+            class="form-control"
+            formControlName="cin"
+            [placeholder]="'patient.form.placeholders.cin' | transloco"
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="editNumeroAssurance" class="form-label">{{ 'patient.form.labels.numeroAssurance' | transloco }}</label>
+          <input
+            type="text"
+            id="editNumeroAssurance"
+            class="form-control"
+            formControlName="numeroAssurance"
+            [placeholder]="'patient.form.placeholders.numeroAssurance' | transloco"
+          />
+        </div>
+
+        <div class="col-12">
+          <hr class="my-2" />
+          <h6 class="text-muted mb-2">{{ 'patient.form.emergencyContact.title' | transloco }}</h6>
+        </div>
+        <div class="col-md-6">
+          <label for="editContactUrgenceNom" class="form-label">{{ 'patient.form.emergencyContact.nom' | transloco }}</label>
+          <input
+            type="text"
+            id="editContactUrgenceNom"
+            class="form-control"
+            formControlName="contactUrgenceNom"
+            [placeholder]="'patient.form.emergencyContact.nomPlaceholder' | transloco"
+          />
+        </div>
+        <div class="col-md-6">
+          <label for="editContactUrgenceTelephone" class="form-label">{{ 'patient.form.emergencyContact.telephone' | transloco }}</label>
+          <input
+            type="tel"
+            id="editContactUrgenceTelephone"
+            class="form-control"
+            formControlName="contactUrgenceTelephone"
+            [placeholder]="'patient.form.emergencyContact.telephonePlaceholder' | transloco"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.cancel' | transloco }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isEditSubmitting()">
+        @if (isEditSubmitting()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ 'patient.form.submitting' | transloco }} } @else {
+        <i class="anticon anticon-save me-1"></i>
+        {{ 'patient.form.submitEdit' | transloco }} }
+      </button>
+    </div>
+  </form>
+</ng-template>

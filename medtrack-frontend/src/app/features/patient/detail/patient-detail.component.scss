@@ -1,0 +1,74 @@
+:host {
+  display: block;
+}
+
+.patient-detail-card {
+  margin-bottom: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .detail-label {
+    width: 180px;
+    font-weight: 500;
+    color: #666;
+    flex-shrink: 0;
+  }
+
+  .detail-value {
+    flex: 1;
+    color: #333;
+    word-break: break-word;
+  }
+}
+
+.patient-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.clinical-banner {
+  position: sticky;
+  top: 60px;
+  z-index: 1020;
+  row-gap: 0.25rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 14px;
+}
+
+.clinical-banner-sep {
+  margin: 0 0.75rem;
+  color: #ccc;
+}
+
+.clinical-banner-allergy {
+  font-weight: 700;
+  color: var(--bs-danger);
+}
+
+.patient-detail-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  .nav-item {
+    flex: 0 0 auto;
+  }
+
+  .nav-link {
+    min-height: 42px;
+    white-space: nowrap;
+  }
+}

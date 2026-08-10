@@ -1,0 +1,395 @@
+<div class="row">
+  <div class="col-12">
+    <app-card [showHeader]="true" [cardTitle]="'appointment.list.title' | transloco" [padding]="0">
+      <div class="p-3 border-bottom">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+          <div class="btn-group" role="group" [attr.aria-label]="'appointment.list.viewToggle.label' | transloco">
+            <button
+              type="button"
+              class="btn btn-sm"
+              [class.btn-primary]="viewMode() === 'list'"
+              [class.btn-outline-primary]="viewMode() !== 'list'"
+              (click)="setViewMode('list')"
+            >
+              <i antIcon type="unordered-list" theme="outline" class="me-1"></i>
+              {{ 'appointment.list.viewToggle.list' | transloco }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm"
+              [class.btn-primary]="viewMode() === 'calendar'"
+              [class.btn-outline-primary]="viewMode() !== 'calendar'"
+              (click)="setViewMode('calendar')"
+            >
+              <i antIcon type="calendar" theme="outline" class="me-1"></i>
+              {{ 'appointment.list.viewToggle.calendar' | transloco }}
+            </button>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-sm text-nowrap" (click)="openCreateModal()">
+            <i antIcon type="plus" theme="outline" class="me-1"></i>
+            {{ 'appointment.list.addButton' | transloco }}
+          </button>
+        </div>
+
+        @if (viewMode() === 'list') {
+          <app-advanced-filters
+            [(panelOpen)]="filtersPanelOpen"
+            [quickSearchValue]="searchInput()"
+            [quickSearchPlaceholder]="'appointment.list.filters.searchPlaceholder' | transloco"
+            (quickSearchValueChange)="searchInput.set($event)"
+            (quickSearchDebounced)="onSearchChange($event)"
+            [activeFilterCount]="activeFilterCount()"
+            [chips]="filterChips()"
+            (chipRemove)="onFilterChipRemove($event)"
+            (resetAll)="onResetAllFilters()"
+            (applyRequested)="onApplyPanelFilters()"
+          >
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">{{ 'appointment.list.filters.statutLabel' | transloco }}</label>
+                <select class="form-select form-select-sm" [ngModel]="statutFilter()" (ngModelChange)="onStatutFilterChange($event)">
+                  <option value="">{{ 'appointment.list.filters.all' | transloco }}</option>
+                  @for (s of statutOptions; track s) {
+                    <option [value]="s">{{ 'appointment.statut.' + s | transloco }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">{{ 'appointment.list.filters.dateFromLabel' | transloco }}</label>
+                <app-date-input
+                  size="sm"
+                  [ngModel]="dateFromFilter()"
+                  (ngModelChange)="onDateFromFilterChange($event)"
+                  [maxDate]="dateToFilter() || null"
+                  [invalid]="dateRangeInvalid()"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">{{ 'appointment.list.filters.dateToLabel' | transloco }}</label>
+                <app-date-input
+                  size="sm"
+                  [ngModel]="dateToFilter()"
+                  (ngModelChange)="onDateToFilterChange($event)"
+                  [minDate]="dateFromFilter() || null"
+                  [invalid]="dateRangeInvalid()"
+                />
+                @if (dateRangeInvalid()) {
+                  <div class="form-text text-danger">{{ 'common.filters.dateRangeInvalid' | transloco }}</div>
+                }
+              </div>
+              @if (isAdmin()) {
+                <div class="col-md-3">
+                  <label class="form-label">{{ 'appointment.list.filters.medecinLabel' | transloco }}</label>
+                  <select class="form-select form-select-sm" [ngModel]="medecinIdFilter()" (ngModelChange)="onMedecinFilterChange($event)">
+                    <option [ngValue]="null">{{ 'appointment.list.filters.medecinAll' | transloco }}</option>
+                    @for (m of medecins(); track m.id) {
+                      <option [ngValue]="m.id">{{ m.nom }} {{ m.prenom }}</option>
+                    }
+                  </select>
+                </div>
+              }
+            </div>
+          </app-advanced-filters>
+        }
+      </div>
+
+      @if (viewMode() === 'calendar') {
+        <div class="p-3">
+          <app-appointment-calendar
+            (dayClick)="onDayClick($event)"
+            (dayAppointmentsClick)="onCalendarDayAppointmentsClick($event)"
+            (appointmentClick)="onAppointmentClick($event)"
+          />
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <app-appointment-table
+            [appointments]="appointments()"
+            [isLoading]="isLoading()"
+            [error]="error()"
+            [highlightedAppointmentId]="highlightedAppointmentId()"
+            [statusUpdatingId]="statusUpdatingId()"
+            [consultationLookupId]="consultationLookupId()"
+            [consultationUnavailableIds]="consultationUnavailableIds()"
+            [canViewMedecin]="isAdmin()"
+            [canStartConsultation]="canStartConsultationInTable"
+            [page]="page()"
+            [totalPages]="totalPages()"
+            [totalElements]="totalElements()"
+            [size]="size()"
+            [sortState]="sortState()"
+            (retryRequested)="loadAppointments()"
+            (viewRequested)="openViewModal($event)"
+            (editRequested)="openEditModal($event)"
+            (deleteRequested)="onDelete($event)"
+            (statusChangeRequested)="onTableStatusChange($event)"
+            (startConsultationRequested)="onStartConsultation($event)"
+            (viewConsultationRequested)="onViewConsultation($event)"
+            (pageChange)="onPageChange($event)"
+            (sizeChange)="onSizeChange($event)"
+            (sortChange)="onSortChange($event)"
+          />
+        </div>
+      }
+    </app-card>
+  </div>
+</div>
+
+<ng-template #appointmentViewModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'appointment.view.title' | transloco }}</h5>
+    <button
+      type="button"
+      class="btn-close"
+      [attr.aria-label]="'common.buttons.close' | transloco"
+      (click)="modal.dismiss('close')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    @if (appointmentViewLoading()) {
+      <div class="text-center p-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+        </div>
+      </div>
+    } @else if (appointmentViewError()) {
+      <div class="alert alert-danger mb-0" role="alert">
+        {{ appointmentViewError() }}
+        <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="loadAppointmentView()">
+          {{ 'common.buttons.retry' | transloco }}
+        </button>
+      </div>
+    } @else if (viewedAppointment(); as appointment) {
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.patient' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">
+            <a class="table-record-link" [routerLink]="['/patients', appointment.patientId]" (click)="modal.dismiss('navigate')">
+              {{ appointment.patientNom }} {{ appointment.patientPrenom }}
+            </a>
+          </p>
+        </div>
+        @if (isAdmin()) {
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.medecin' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">
+              <a class="table-record-link" [routerLink]="['/medecins', appointment.medecinId]" (click)="modal.dismiss('navigate')">
+                {{ appointment.medecinNom }} {{ appointment.medecinPrenom }}
+              </a>
+            </p>
+          </div>
+        }
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'appointment.list.columns.dateHeure' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ appointment.dateHeure | dateTimeFormat }}</p>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.statut' | transloco }}</label>
+          <p class="form-control-plaintext mb-0"><app-appointment-statut-badge [statut]="appointment.statut" /></p>
+        </div>
+        <div class="col-12">
+          <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.motif' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ appointment.motif }}</p>
+        </div>
+        <div class="col-12">
+          <label class="form-label text-muted mb-1">{{ 'appointment.form.labels.notes' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ appointment.notes || '—' }}</p>
+        </div>
+      </div>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('close')">
+      {{ 'common.buttons.close' | transloco }}
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #appointmentModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (modalMode === 'create' ? 'appointment.form.createTitle' : 'appointment.form.editTitle') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <form #appointmentForm="ngForm" (ngSubmit)="onSubmit(appointmentForm, modal)">
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-12 position-relative">
+          <label class="form-label required" for="appointmentPatient">{{ 'appointment.form.labels.patient' | transloco }}</label>
+          @if (modalMode === 'create') {
+            <input
+              type="text"
+              id="appointmentPatient"
+              class="form-control"
+              name="patientSearch"
+              [ngModel]="patientSearchInput()"
+              (ngModelChange)="patientSearchInput.set($event)"
+              appDebounceInput
+              [debounceMs]="300"
+              (debouncedInput)="onPatientSearchChange($event)"
+              (blur)="onPatientSearchBlur()"
+              [placeholder]="'appointment.form.placeholders.patientSearch' | transloco"
+              [class.is-invalid]="formSubmitted() && appointmentModel.patientId === null"
+              autocomplete="off"
+            />
+            @if (patientSearchResults().length > 0 && appointmentModel.patientId === null) {
+              <div class="list-group appointment-patient-results shadow-sm">
+                @for (p of patientSearchResults(); track p.id) {
+                  <button type="button" class="list-group-item list-group-item-action" (click)="selectPatient(p)">
+                    {{ p.nom }} {{ p.prenom }}
+                  </button>
+                }
+              </div>
+            }
+            @if (formSubmitted() && appointmentModel.patientId === null) {
+              <div class="invalid-feedback d-block">{{ 'appointment.form.errors.patientRequired' | transloco }}</div>
+            }
+          } @else {
+            <input type="text" id="appointmentPatient" class="form-control" [value]="selectedPatientLabel()" disabled />
+          }
+        </div>
+
+        @if (isAdmin()) {
+          <div class="col-md-6">
+            <label class="form-label required" for="appointmentMedecin">{{ 'appointment.form.labels.medecin' | transloco }}</label>
+            <select
+              id="appointmentMedecin"
+              class="form-control"
+              name="medecinId"
+              [ngModel]="appointmentModel.medecinId"
+              (ngModelChange)="onFormMedecinChange($event)"
+              required
+              #medecinField="ngModel"
+              [class.is-invalid]="formSubmitted() && appointmentModel.medecinId === null"
+            >
+              <option [ngValue]="null" disabled>{{ 'patient.form.placeholders.medecinSelect' | transloco }}</option>
+              @for (m of medecins(); track m.id) {
+                <option [ngValue]="m.id">{{ m.nom }} {{ m.prenom }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <div class="col-md-6">
+          <label class="form-label required" for="appointmentDate">{{ 'appointment.form.labels.date' | transloco }}</label>
+          <app-date-input
+            inputId="appointmentDate"
+            name="date"
+            [ngModel]="appointmentModel.date"
+            (ngModelChange)="onFormDateChange($event)"
+            required
+            [minDate]="modalMode === 'create' ? todayLocalDate : null"
+            [dateDisabled]="isAppointmentDateDisabled"
+            #dateField="ngModel"
+            [invalid]="formSubmitted() && dateField.invalid"
+          />
+          @if (formSubmitted() && dateField.errors?.['dateDisabled']) {
+            <div class="invalid-feedback d-block">{{ 'appointment.form.errors.sundayUnavailable' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-12">
+          <label class="form-label required">{{ 'appointment.form.labels.creneau' | transloco }}</label>
+          @if (!appointmentModel.medecinId || !appointmentModel.date) {
+            <div class="form-text">{{ 'appointment.form.creneaux.selectMedecinDate' | transloco }}</div>
+          } @else if (creneauxLoading()) {
+            <div class="d-flex align-items-center gap-2 text-muted">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              {{ 'appointment.form.creneaux.loading' | transloco }}
+            </div>
+          } @else if (creneauxError()) {
+            <div class="alert alert-warning py-2 mb-0 d-flex align-items-center justify-content-between gap-2">
+              <span>{{ 'appointment.form.creneaux.loadFailed' | transloco }}</span>
+              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onFormDateChange(appointmentModel.date)">
+                {{ 'common.buttons.retry' | transloco }}
+              </button>
+            </div>
+          } @else if (creneaux().length === 0) {
+            <div class="alert alert-warning py-2 mb-0">{{ 'appointment.form.creneaux.empty' | transloco }}</div>
+          } @else {
+            <div class="d-flex flex-wrap gap-2 appointment-creneaux">
+              @for (c of creneaux(); track c) {
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [class.btn-primary]="appointmentModel.heure === c"
+                  [class.btn-outline-secondary]="appointmentModel.heure !== c"
+                  [attr.aria-pressed]="appointmentModel.heure === c"
+                  (click)="selectCreneau(c)"
+                >
+                  {{ c }}
+                </button>
+              }
+            </div>
+          }
+          @if (formSubmitted() && !appointmentModel.heure) {
+            <div class="invalid-feedback d-block">{{ 'appointment.form.errors.creneauRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label required" for="appointmentMotif">{{ 'appointment.form.labels.motif' | transloco }}</label>
+          <input
+            type="text"
+            id="appointmentMotif"
+            class="form-control"
+            name="motif"
+            [(ngModel)]="appointmentModel.motif"
+            required
+            #motifField="ngModel"
+            [class.is-invalid]="formSubmitted() && motifField.invalid"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="appointmentStatut">{{ 'appointment.form.labels.statut' | transloco }}</label>
+          @if (modalMode === 'edit') {
+            <select id="appointmentStatut" class="form-control" name="statut" [(ngModel)]="appointmentModel.statut">
+              @for (s of statutOptions; track s) {
+                <option [ngValue]="s">{{ 'appointment.statut.' + s | transloco }}</option>
+              }
+            </select>
+          } @else {
+            <input type="text" id="appointmentStatut" class="form-control" [value]="'appointment.statut.PLANIFIE' | transloco" disabled />
+            <small class="text-muted d-block mt-1">{{ 'appointment.form.statutLockedCreate' | transloco }}</small>
+          }
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="appointmentNotes">{{ 'appointment.form.labels.notes' | transloco }}</label>
+          <textarea id="appointmentNotes" class="form-control" name="notes" rows="2" [(ngModel)]="appointmentModel.notes"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.cancel' | transloco }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="formSubmitting()">
+        @if (formSubmitting()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        }
+        {{ 'common.buttons.save' | transloco }}
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #confirmDeleteModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'appointment.list.deleteModal.title' | transloco }}</h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">{{ 'appointment.list.deleteModal.body' | transloco }}</div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">
+      <i antIcon type="delete" theme="outline" class="me-1"></i>
+      {{ 'common.buttons.delete' | transloco }}
+    </button>
+  </div>
+</ng-template>

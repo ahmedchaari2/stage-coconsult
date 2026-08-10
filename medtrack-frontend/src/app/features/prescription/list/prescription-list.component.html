@@ -1,0 +1,439 @@
+<div class="row">
+  <div class="col-12">
+    <app-card [showHeader]="true" [cardTitle]="'prescription.list.title' | transloco" [padding]="0">
+      <div class="p-3 border-bottom">
+        <div class="d-flex flex-wrap justify-content-end mb-3">
+          <button type="button" class="btn btn-primary btn-sm text-nowrap" (click)="openCreateWizard()">
+            <i antIcon type="plus" theme="outline" class="me-1"></i>
+            {{ 'prescription.list.addButton' | transloco }}
+          </button>
+        </div>
+        <app-advanced-filters
+          [(panelOpen)]="filtersPanelOpen"
+          [quickSearchValue]="searchInput()"
+          [quickSearchPlaceholder]="'prescription.list.filters.searchPlaceholder' | transloco"
+          (quickSearchValueChange)="searchInput.set($event)"
+          (quickSearchDebounced)="onSearchChange($event)"
+          [activeFilterCount]="activeFilterCount()"
+          [chips]="filterChips()"
+          (chipRemove)="onFilterChipRemove($event)"
+          (resetAll)="onResetAllFilters()"
+          (applyRequested)="onApplyPanelFilters()"
+        >
+          <div class="row g-3">
+            <div class="col-md-3 position-relative">
+              <label class="form-label">{{ 'prescription.list.filters.patientLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="patientFilterSearchInput()"
+                (ngModelChange)="patientFilterSearchInput.set($event)"
+                appDebounceInput
+                [debounceMs]="300"
+                (debouncedInput)="onPatientFilterSearchChange($event)"
+                (blur)="onPatientFilterBlur()"
+                [placeholder]="'prescription.list.filters.patientPlaceholder' | transloco"
+                autocomplete="off"
+              />
+              @if (patientFilterResults().length > 0) {
+                <div class="list-group position-absolute w-100 shadow-sm" style="z-index: 10">
+                  @for (p of patientFilterResults(); track p.id) {
+                    <button type="button" class="list-group-item list-group-item-action" (click)="selectPatientFilter(p)">
+                      {{ p.nom }} {{ p.prenom }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+            @if (isAdmin()) {
+              <div class="col-md-3">
+                <label class="form-label">{{ 'prescription.list.filters.medecinLabel' | transloco }}</label>
+                <select class="form-select form-select-sm" [ngModel]="medecinIdFilter()" (ngModelChange)="onMedecinFilterChange($event)">
+                  <option [ngValue]="null">{{ 'prescription.list.filters.medecinAll' | transloco }}</option>
+                  @for (m of medecins(); track m.id) {
+                    <option [ngValue]="m.id">{{ m.nom }} {{ m.prenom }}</option>
+                  }
+                </select>
+              </div>
+            }
+            <div class="col-md-3">
+              <label class="form-label">{{ 'prescription.list.filters.dateFromLabel' | transloco }}</label>
+              <app-date-input
+                size="sm"
+                [ngModel]="dateFromFilter()"
+                (ngModelChange)="onDateFromFilterChange($event)"
+                [maxDate]="dateToFilter() || null"
+                [invalid]="dateRangeInvalid()"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'prescription.list.filters.dateToLabel' | transloco }}</label>
+              <app-date-input
+                size="sm"
+                [ngModel]="dateToFilter()"
+                (ngModelChange)="onDateToFilterChange($event)"
+                [minDate]="dateFromFilter() || null"
+                [invalid]="dateRangeInvalid()"
+              />
+              @if (dateRangeInvalid()) {
+                <div class="form-text text-danger">{{ 'common.filters.dateRangeInvalid' | transloco }}</div>
+              }
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'prescription.list.filters.statutCalculeLabel' | transloco }}</label>
+              <select
+                class="form-select form-select-sm"
+                [ngModel]="statutCalculeFilter()"
+                (ngModelChange)="onStatutCalculeFilterChange($event)"
+              >
+                <option value="">{{ 'common.filters.all' | transloco }}</option>
+                <option value="ACTIVE">{{ 'prescription.list.statut.active' | transloco }}</option>
+                <option value="EXPIREE">{{ 'prescription.list.statut.expiree' | transloco }}</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <div class="form-check form-switch mb-0">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id="prescriptionsShowArchivedFilter"
+                  [ngModel]="showArchivedFilter()"
+                  (ngModelChange)="onShowArchivedFilterChange($event)"
+                />
+                <label class="form-check-label" for="prescriptionsShowArchivedFilter">
+                  {{ 'prescription.list.filters.showArchivedLabel' | transloco }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </app-advanced-filters>
+      </div>
+
+      <div class="table-responsive">
+        @if (isLoading()) {
+          <div class="text-center p-5">
+            <app-spinner [backgroundColor]="'var(--bs-primary)'" [spinner]="spinkit" />
+            <p class="mt-3 text-muted">{{ 'prescription.list.loading' | transloco }}</p>
+          </div>
+        } @else if (error()) {
+          <div class="alert alert-danger m-3" role="alert">
+            {{ error() }}
+            <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="loadPrescriptions()">
+              {{ 'common.buttons.retry' | transloco }}
+            </button>
+          </div>
+        } @else if (prescriptions().length === 0) {
+          <div class="text-center p-5">
+            <i antIcon type="medicine-box" theme="outline" class="f-48 text-muted mb-3"></i>
+            @if (searchTerm()) {
+              <h5 class="text-muted">{{ 'common.search.noResults' | transloco: { term: searchTerm() } }}</h5>
+              <button type="button" class="btn btn-outline-secondary btn-sm mt-2" (click)="onResetAllFilters()">
+                {{ 'common.search.reset' | transloco }}
+              </button>
+            } @else {
+              <h5 class="text-muted">{{ 'prescription.list.empty.title' | transloco }}</h5>
+              <p class="text-muted">{{ 'prescription.list.empty.text' | transloco }}</p>
+            }
+          </div>
+        } @else {
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" appSortableColumn="medicament" [sortState]="sortState()" (sortChange)="onSortChange($event)">
+                  {{ 'prescription.fields.medicament' | transloco }}
+                </th>
+                <th scope="col">{{ 'prescription.fields.posologie' | transloco }}</th>
+                <th scope="col">{{ 'prescription.list.columns.patient' | transloco }}</th>
+                @if (isAdmin()) {
+                  <th scope="col">{{ 'prescription.list.columns.medecin' | transloco }}</th>
+                }
+                <th scope="col">{{ 'prescription.list.columns.consultationDate' | transloco }}</th>
+                <th scope="col">{{ 'prescription.fields.dureeJours' | transloco }}</th>
+                <th scope="col">{{ 'prescription.list.columns.statutCalcule' | transloco }}</th>
+                <th scope="col" class="text-center">{{ 'common.labels.actions' | transloco }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of prescriptions(); track p.id) {
+                <tr>
+                  <td class="f-w-500">
+                    {{ p.medicament }}
+                    @if (p.renouvelable) {
+                      <span
+                        class="badge rounded-pill bg-info-subtle text-info ms-1"
+                        [ngbTooltip]="'prescription.fields.renouvelable' | transloco"
+                        container="body"
+                      >
+                        {{ 'prescription.badges.renouvelable' | transloco }}
+                      </span>
+                    }
+                    @if (p.archived) {
+                      <span class="badge rounded-pill bg-secondary ms-1">{{ 'common.labels.archived' | transloco }}</span>
+                    }
+                  </td>
+                  <td>{{ p.posologie }}</td>
+                  <td>
+                    @if (p.patientId !== null && p.patientId !== undefined) {
+                      <a
+                        class="table-record-link"
+                        [routerLink]="['/patients', p.patientId]"
+                        [attr.aria-label]="'prescription.list.viewPatientRow' | transloco: { nom: p.patientNom, prenom: p.patientPrenom }"
+                      >
+                        {{ p.patientNom }} {{ p.patientPrenom }}
+                      </a>
+                    } @else {
+                      <span>{{ p.patientNom }} {{ p.patientPrenom }}</span>
+                    }
+                  </td>
+                  @if (isAdmin()) {
+                    <td>
+                      @if (p.medecinId !== null && p.medecinId !== undefined) {
+                        <a
+                          class="table-record-link"
+                          [routerLink]="['/medecins', p.medecinId]"
+                          [attr.aria-label]="'prescription.list.viewMedecinRow' | transloco: { nom: p.medecinNom, prenom: p.medecinPrenom }"
+                        >
+                          {{ p.medecinNom }} {{ p.medecinPrenom }}
+                        </a>
+                      } @else {
+                        <span>{{ p.medecinNom }} {{ p.medecinPrenom }}</span>
+                      }
+                    </td>
+                  }
+                  <td>{{ p.consultationDate | dateFormat }}</td>
+                  <td>{{ p.dureeJours !== null ? p.dureeJours + ' ' + ('prescription.list.joursUnit' | transloco) : '—' }}</td>
+                  <td>
+                    @switch (statutCalcule(p.consultationDate, p.dureeJours)) {
+                      @case ('active') {
+                        <span class="badge rounded-pill badge-statut-confirme">
+                          <i antIcon type="check-circle" theme="outline" class="me-1" aria-hidden="true"></i>
+                          {{ 'prescription.list.statut.active' | transloco }}
+                        </span>
+                      }
+                      @case ('expiree') {
+                        <span class="badge rounded-pill badge-statut-annule">
+                          <i antIcon type="clock-circle" theme="outline" class="me-1" aria-hidden="true"></i>
+                          {{ 'prescription.list.statut.expiree' | transloco }}
+                        </span>
+                      }
+                      @default {
+                        <span class="text-muted">—</span>
+                      }
+                    }
+                  </td>
+                  <td class="text-center" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        (click)="onView(p)"
+                        [ngbTooltip]="'common.buttons.view' | transloco"
+                        [attr.aria-label]="'common.buttons.view' | transloco"
+                        container="body"
+                        [disabled]="viewLoadingId() === p.id"
+                      >
+                        @if (viewLoadingId() === p.id) {
+                          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        } @else {
+                          <i antIcon type="eye" theme="outline"></i>
+                        }
+                      </button>
+                      <span
+                        class="d-inline-block"
+                        [ngbTooltip]="
+                          p.archived
+                            ? ('prescription.ordonnance.archivedTooltip' | transloco)
+                            : ('prescription.ordonnance.tooltip' | transloco)
+                        "
+                        container="body"
+                      >
+                        <button
+                          type="button"
+                          class="btn btn-outline-primary btn-sm"
+                          [disabled]="p.archived || ordonnanceLoadingId() === p.id"
+                          (click)="onPrintOrdonnance(p)"
+                          [attr.aria-label]="
+                            p.archived
+                              ? ('prescription.ordonnance.archivedTooltip' | transloco)
+                              : ('prescription.ordonnance.tooltip' | transloco)
+                          "
+                        >
+                          @if (ordonnanceLoadingId() === p.id) {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          } @else {
+                            <i antIcon type="printer" theme="outline"></i>
+                          }
+                        </button>
+                      </span>
+                      <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        (click)="onRenew(p)"
+                        [ngbTooltip]="'prescription.list.renewTooltip' | transloco"
+                        [attr.aria-label]="'prescription.list.renewTooltip' | transloco"
+                        container="body"
+                      >
+                        <i antIcon type="redo" theme="outline"></i>
+                      </button>
+                      @if (p.archived) {
+                        <button
+                          type="button"
+                          class="btn btn-outline-success"
+                          (click)="onArchiveToggle(p)"
+                          [ngbTooltip]="'common.buttons.restore' | transloco"
+                          [attr.aria-label]="'common.buttons.restore' | transloco"
+                          container="body"
+                        >
+                          <i antIcon type="rollback" theme="outline"></i>
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="btn btn-outline-secondary"
+                          (click)="onEdit(p)"
+                          [ngbTooltip]="'common.buttons.edit' | transloco"
+                          [attr.aria-label]="'common.buttons.edit' | transloco"
+                          container="body"
+                        >
+                          <i antIcon type="edit" theme="outline"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-danger"
+                          (click)="onArchiveToggle(p)"
+                          [ngbTooltip]="'common.buttons.archive' | transloco"
+                          [attr.aria-label]="'common.buttons.archive' | transloco"
+                          container="body"
+                        >
+                          <i antIcon type="inbox" theme="outline"></i>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="p-3 border-top">
+            <app-pagination
+              [page]="page()"
+              [totalPages]="totalPages()"
+              [totalElements]="totalElements()"
+              [size]="size()"
+              (pageChange)="onPageChange($event)"
+              (sizeChange)="onSizeChange($event)"
+            />
+          </div>
+        }
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<ng-template #prescriptionViewModal let-modal>
+  @if (viewedPrescription; as prescription) {
+    <div class="modal-header">
+      <h5 class="modal-title">{{ 'prescription.view.title' | transloco }}</h5>
+      <button
+        type="button"
+        class="btn-close"
+        [attr.aria-label]="'common.buttons.close' | transloco"
+        (click)="modal.dismiss('close')"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'prescription.fields.medicament' | transloco }}</label>
+          <p class="form-control-plaintext f-w-500 mb-0">{{ prescription.medicament }}</p>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'prescription.fields.posologie' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ prescription.posologie }}</p>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'prescription.list.columns.patient' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">
+            <a class="table-record-link" [routerLink]="['/patients', prescription.patientId]" (click)="modal.dismiss('navigate')">
+              {{ prescription.patientNom }} {{ prescription.patientPrenom }}
+            </a>
+          </p>
+        </div>
+        @if (isAdmin()) {
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'prescription.list.columns.medecin' | transloco }}</label>
+            <p class="form-control-plaintext mb-0">
+              @if (prescription.medecinId !== null && prescription.medecinId !== undefined) {
+                <a class="table-record-link" [routerLink]="['/medecins', prescription.medecinId]" (click)="modal.dismiss('navigate')">
+                  {{ prescription.medecinNom }} {{ prescription.medecinPrenom }}
+                </a>
+              } @else {
+                {{ prescription.medecinNom }} {{ prescription.medecinPrenom }}
+              }
+            </p>
+          </div>
+        }
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'prescription.list.columns.consultationDate' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ prescription.consultationDate | dateFormat }}</p>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted mb-1">{{ 'prescription.fields.dureeJours' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">
+            {{ prescription.dureeJours !== null ? prescription.dureeJours + ' ' + ('prescription.list.joursUnit' | transloco) : '—' }}
+          </p>
+        </div>
+        <div class="col-12">
+          <label class="form-label text-muted mb-1">{{ 'prescription.fields.instructions' | transloco }}</label>
+          <p class="form-control-plaintext mb-0">{{ prescription.instructions || '—' }}</p>
+        </div>
+        <div class="col-12 d-flex flex-wrap gap-2">
+          @if (prescription.renouvelable) {
+            <span class="badge rounded-pill bg-info-subtle text-info">{{ 'prescription.badges.renouvelable' | transloco }}</span>
+          }
+          @if (prescription.archived) {
+            <span class="badge rounded-pill bg-secondary">{{ 'common.labels.archived' | transloco }}</span>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('close')">
+        {{ 'common.buttons.close' | transloco }}
+      </button>
+    </div>
+  }
+</ng-template>
+
+<app-prescription-edit-modal (saved)="onPrescriptionSaved()" />
+
+<app-prescription-create-wizard (saved)="onWizardSaved()" />
+
+<ng-template #confirmArchiveModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (pendingAction === 'restore' ? 'prescription.restoreModal.title' : 'prescription.archiveModal.title') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    {{ (pendingAction === 'restore' ? 'prescription.restoreModal.body' : 'prescription.archiveModal.body') | transloco }}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    @if (pendingAction === 'restore') {
+      <button type="button" class="btn btn-success" (click)="modal.close('confirm')">
+        <i antIcon type="rollback" theme="outline" class="me-1"></i>
+        {{ 'common.buttons.restore' | transloco }}
+      </button>
+    } @else {
+      <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">
+        <i antIcon type="inbox" theme="outline" class="me-1"></i>
+        {{ 'common.buttons.archive' | transloco }}
+      </button>
+    }
+  </div>
+</ng-template>

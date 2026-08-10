@@ -1,0 +1,108 @@
+<ng-template #editModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'medecin.edit.title' | transloco }}</h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <form [formGroup]="editForm" (ngSubmit)="onSubmit(modal)" novalidate>
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="medecinEditNom" class="form-label required">{{ 'medecin.edit.labels.nom' | transloco }}</label>
+          <input
+            type="text"
+            id="medecinEditNom"
+            class="form-control"
+            formControlName="nom"
+            [placeholder]="'medecin.edit.placeholders.nom' | transloco"
+            [class.is-invalid]="hasError('nom')"
+          />
+          @if (hasError('nom')) {
+          <div class="invalid-feedback">{{ 'medecin.edit.errors.nomRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="medecinEditPrenom" class="form-label required">{{ 'medecin.edit.labels.prenom' | transloco }}</label>
+          <input
+            type="text"
+            id="medecinEditPrenom"
+            class="form-control"
+            formControlName="prenom"
+            [placeholder]="'medecin.edit.placeholders.prenom' | transloco"
+            [class.is-invalid]="hasError('prenom')"
+          />
+          @if (hasError('prenom')) {
+          <div class="invalid-feedback">{{ 'medecin.edit.errors.prenomRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-12">
+          <label for="medecinEditEmail" class="form-label required">{{ 'medecin.edit.labels.email' | transloco }}</label>
+          <input
+            type="email"
+            id="medecinEditEmail"
+            class="form-control"
+            formControlName="email"
+            [placeholder]="'medecin.edit.placeholders.email' | transloco"
+            [class.is-invalid]="hasError('email')"
+          />
+          @if (hasError('email', 'email')) {
+          <div class="invalid-feedback">{{ 'medecin.edit.errors.emailInvalid' | transloco }}</div>
+          } @else if (hasError('email')) {
+          <div class="invalid-feedback">{{ 'medecin.edit.errors.emailRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="medecinEditSpecialite" class="form-label">{{ 'medecin.edit.labels.specialite' | transloco }}</label>
+          <input
+            type="text"
+            id="medecinEditSpecialite"
+            class="form-control"
+            formControlName="specialite"
+            [placeholder]="'medecin.edit.placeholders.specialite' | transloco"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label for="medecinEditNumeroOrdre" class="form-label">{{ 'medecin.edit.labels.numeroOrdre' | transloco }}</label>
+          <input
+            type="text"
+            id="medecinEditNumeroOrdre"
+            class="form-control"
+            formControlName="numeroOrdre"
+            [placeholder]="'medecin.edit.placeholders.numeroOrdre' | transloco"
+          />
+        </div>
+
+        <div class="col-12">
+          <label for="medecinEditTelephone" class="form-label">{{ 'medecin.edit.labels.telephone' | transloco }}</label>
+          <input
+            type="tel"
+            id="medecinEditTelephone"
+            class="form-control"
+            formControlName="telephone"
+            autocomplete="tel"
+            [placeholder]="'medecin.edit.placeholders.telephone' | transloco"
+            [class.is-invalid]="hasError('telephone')"
+          />
+          @if (hasError('telephone')) {
+          <div class="invalid-feedback">{{ 'medecin.edit.errors.telephoneInvalid' | transloco }}</div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.cancel' | transloco }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isEditSubmitting()">
+        @if (isEditSubmitting()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ 'medecin.edit.submitting' | transloco }} } @else {
+        <i class="anticon anticon-save me-1"></i>
+        {{ 'common.buttons.save' | transloco }} }
+      </button>
+    </div>
+  </form>
+</ng-template>

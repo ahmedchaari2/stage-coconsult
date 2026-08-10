@@ -1,0 +1,136 @@
+# Gateway-specific settings. The JWT secret is shared with user-service through application.yml.
+server:
+  port: 8080
+
+eureka:
+  client:
+    register-with-eureka: false
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: ["http://localhost:4200"]
+                allowedMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+                allowedHeaders: ["*"]
+                allowCredentials: true
+          routes:
+            - id: prescription-service
+              uri: lb://prescription-service
+              predicates:
+                - Path=/api/prescriptions/**,/api/consultations/*/prescriptions,/api/consultations/*/ordonnance
+              filters:
+                - CircuitBreaker=prescriptionServiceCircuitBreaker
+
+            - id: medicalrecord-service
+              uri: lb://medicalrecord-service
+              predicates:
+                - Path=/api/medical-records/**,/api/consultations/**,/api/patients/*/medical-record/**,/api/acces-logs/**
+              filters:
+                - CircuitBreaker=medicalRecordServiceCircuitBreaker
+
+            - id: patient-service
+              uri: lb://patient-service
+              predicates:
+                - Path=/api/patients/**
+              filters:
+                - CircuitBreaker=patientServiceCircuitBreaker
+
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/auth/**,/api/users/**,/api/invitations/**,/uploads/profile-photos/**
+              filters:
+                - CircuitBreaker=userServiceCircuitBreaker
+
+            - id: appointment-service
+              uri: lb://appointment-service
+              predicates:
+                - Path=/api/appointments/**
+              filters:
+                - CircuitBreaker=appointmentServiceCircuitBreaker
+
+            - id: dashboard-service
+              uri: lb://dashboard-service
+              predicates:
+                - Path=/api/dashboard/**
+              filters:
+                - CircuitBreaker=dashboardServiceCircuitBreaker
+
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/notifications/**
+              filters:
+                - CircuitBreaker=notificationServiceCircuitBreaker
+
+            - id: ai-service
+              uri: lb://ai-service
+              predicates:
+                - Path=/ai/**
+              filters:
+                - CircuitBreaker=aiServiceCircuitBreaker
+
+          httpclient:
+            connect-timeout: 5000
+            response-timeout: 5s
+
+resilience4j:
+  timelimiter:
+    instances:
+      patientServiceCircuitBreaker:
+        timeout-duration: 5s
+      userServiceCircuitBreaker:
+        timeout-duration: 5s
+      medicalRecordServiceCircuitBreaker:
+        timeout-duration: 5s
+      appointmentServiceCircuitBreaker:
+        timeout-duration: 5s
+      prescriptionServiceCircuitBreaker:
+        timeout-duration: 5s
+      notificationServiceCircuitBreaker:
+        timeout-duration: 5s
+      dashboardServiceCircuitBreaker:
+        timeout-duration: 5s
+      aiServiceCircuitBreaker:
+        timeout-duration: 30s
+  circuitbreaker:
+    instances:
+      patientServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      userServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      medicalRecordServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      appointmentServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      prescriptionServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      notificationServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      dashboardServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      aiServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+

@@ -1,0 +1,52 @@
+<div class="app-pagination d-flex flex-wrap justify-content-between align-items-center gap-3">
+  <div class="app-pagination__size d-flex align-items-center gap-2">
+    <label [for]="pageSizeSelectId" class="text-muted mb-0 text-nowrap">{{ 'pagination.show' | transloco }}</label>
+    <select
+      [id]="pageSizeSelectId"
+      class="form-select form-select-sm w-auto"
+      [disabled]="totalElements() === 0"
+      [ngModel]="size()"
+      (ngModelChange)="onSizeChange($event)"
+    >
+      @for (option of sizeOptions(); track option) {
+      <option [ngValue]="option">{{ option }}</option>
+      }
+    </select>
+    <span class="text-muted text-nowrap">{{ 'pagination.perPage' | transloco }}</span>
+  </div>
+
+  <div class="app-pagination__range text-muted text-nowrap">
+    @if (totalElements() === 0) { {{ 'pagination.noItems' | transloco }} } @else { {{ rangeStart() }}–{{ rangeEnd() }} {{ 'pagination.of' |
+    transloco }} {{ totalElements() }} {{ (totalElements() > 1 ? 'pagination.items' : 'pagination.item') | transloco }}
+    <span class="app-pagination__page-of ms-1">
+      ({{ 'pagination.page' | transloco }} {{ page() + 1 }} {{ 'pagination.of' | transloco }} {{ totalPages() }})
+    </span>
+    }
+  </div>
+
+  @if (totalPages() > 1) {
+  <nav aria-label="Pagination">
+    <ul class="pagination mb-0">
+      <li class="page-item" [class.disabled]="page() === 0">
+        <button type="button" class="page-link" [disabled]="page() === 0" (click)="goTo(page() - 1)">
+          {{ 'common.buttons.previous' | transloco }}
+        </button>
+      </li>
+      @for (item of pagerItems(); track $index) { @if (item === ellipsis) {
+      <li class="page-item disabled">
+        <span class="page-link">…</span>
+      </li>
+      } @else {
+      <li class="page-item" [class.active]="item === page()">
+        <button type="button" class="page-link page-number" (click)="goTo(item)">{{ item + 1 }}</button>
+      </li>
+      } }
+      <li class="page-item" [class.disabled]="page() >= totalPages() - 1">
+        <button type="button" class="page-link" [disabled]="page() >= totalPages() - 1" (click)="goTo(page() + 1)">
+          {{ 'common.buttons.next' | transloco }}
+        </button>
+      </li>
+    </ul>
+  </nav>
+  }
+</div>

@@ -1,0 +1,117 @@
+<div class="page-header">
+  <div class="page-block">
+    <div class="row align-items-center">
+      <div class="col-md-12">
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/dashboard']" class="home">{{ 'nav.breadcrumbHome' | transloco }}</a></li>
+          <li class="breadcrumb-item"><a [routerLink]="['/medecins']" class="f-14 f-w-600">{{ 'nav.medecins.list' | transloco }}</a></li>
+          <li class="breadcrumb-item"><span class="f-14 f-w-600">{{ pageTitle ?? ('medecin.detail.title' | transloco) }}</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <app-card [showHeader]="true" [cardTitle]="pageTitle ?? ('medecin.detail.title' | transloco)" [padding]="24">
+      @if (error()) {
+      <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        {{ error() }}
+        <button type="button" class="btn-close" (click)="error.set(null)" aria-label="Fermer"></button>
+      </div>
+      } @if (isLoading()) {
+      <div class="text-center p-5">
+        <app-spinner [backgroundColor]="'var(--bs-primary)'" [spinner]="spinkit"></app-spinner>
+        <p class="mt-3 text-muted">{{ 'medecin.edit.loading' | transloco }}</p>
+      </div>
+      } @else if (medecin(); as m) {
+      <div class="patient-detail">
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">{{ 'medecin.detail.sectionTitle' | transloco }}</h5>
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-primary" (click)="onEdit()" [title]="'common.buttons.edit' | transloco">
+                  <i class="anticon anticon-edit me-1"></i>
+                  {{ 'common.buttons.edit' | transloco }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h6 class="detail-section-title">{{ 'medecin.detail.identitySection' | transloco }}</h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medecin.edit.labels.nom' | transloco }}</label>
+            <p class="form-control-plaintext f-w-500">{{ m.nom }}</p>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medecin.edit.labels.prenom' | transloco }}</label>
+            <p class="form-control-plaintext f-w-500">{{ m.prenom }}</p>
+          </div>
+        </div>
+
+        <h6 class="detail-section-title">{{ 'medecin.detail.professionalSection' | transloco }}</h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medecin.edit.labels.specialite' | transloco }}</label>
+            <p class="form-control-plaintext f-w-500">{{ m.specialite || '—' }}</p>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medecin.edit.labels.numeroOrdre' | transloco }}</label>
+            <p class="form-control-plaintext f-w-500">{{ m.numeroOrdre || '—' }}</p>
+          </div>
+        </div>
+
+        <h6 class="detail-section-title">{{ 'medecin.detail.contactSection' | transloco }}</h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medecin.edit.labels.email' | transloco }}</label>
+            <p class="form-control-plaintext"><app-email-link [value]="m.email" /></p>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medecin.edit.labels.telephone' | transloco }}</label>
+            <p class="form-control-plaintext">
+              @if (m.telephone) {
+              <app-phone-link [value]="m.telephone" />
+              } @else { — }
+            </p>
+          </div>
+        </div>
+
+        <h6 class="detail-section-title">{{ 'medecin.detail.accountSection' | transloco }}</h6>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medecin.gestion.columns.statut' | transloco }}</label>
+            <p class="form-control-plaintext">
+              <app-medecin-statut-badge [actif]="m.actif" />
+            </p>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label text-muted mb-1">{{ 'medecin.detail.createdAt' | transloco }}</label>
+            <p class="form-control-plaintext f-w-500">{{ m.createdAt ? (m.createdAt | dateFormat) : '—' }}</p>
+          </div>
+        </div>
+      </div>
+      } @else {
+      <div class="text-center p-5">
+        <i class="anticon anticon-file-text f-48 text-muted mb-3"></i>
+        <h5 class="text-muted">{{ 'medecin.gestion.empty.title' | transloco }}</h5>
+        <p class="text-muted">{{ 'medecin.detail.empty.text' | transloco }}</p>
+        <button type="button" class="btn btn-primary mt-2" (click)="onBack()">
+          <i class="anticon anticon-left me-1"></i>
+          {{ 'common.buttons.backToList' | transloco }}
+        </button>
+      </div>
+      }
+    </app-card>
+  </div>
+</div>
+
+<app-medecin-edit-modal (saved)="onMedecinSaved($event)" />

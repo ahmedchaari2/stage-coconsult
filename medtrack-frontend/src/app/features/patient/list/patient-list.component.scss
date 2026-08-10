@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+.search-box {
+  max-width: 320px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}

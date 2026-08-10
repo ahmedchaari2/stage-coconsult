@@ -1,0 +1,98 @@
+<ng-template #wizardModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (isRenewal() ? 'prescription.createWizard.renewTitle' : 'prescription.createWizard.title') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    @if (step() === 'patient') {
+      <label class="form-label" for="wizardPatientSearch">{{ 'prescription.createWizard.stepPatient.label' | transloco }}</label>
+      <div class="position-relative">
+        <input
+          type="text"
+          id="wizardPatientSearch"
+          class="form-control"
+          [ngModel]="patientSearchInput()"
+          (ngModelChange)="patientSearchInput.set($event)"
+          appDebounceInput
+          [debounceMs]="300"
+          (debouncedInput)="onPatientSearchChange($event)"
+          (blur)="onPatientSearchBlur()"
+          [placeholder]="'prescription.createWizard.stepPatient.searchPlaceholder' | transloco"
+          autocomplete="off"
+        />
+        @if (patientSearchLoading()) {
+          <div class="text-muted small mt-2">
+            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            {{ 'common.loading' | transloco }}
+          </div>
+        }
+        @if (patientSearchResults().length > 0) {
+          <div class="list-group mt-2 shadow-sm">
+            @for (p of patientSearchResults(); track p.id) {
+              <button type="button" class="list-group-item list-group-item-action" (click)="selectPatient(p)">
+                {{ p.nom }} {{ p.prenom }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <span class="text-muted small d-block">{{ 'prescription.createWizard.stepConsultation.label' | transloco }}</span>
+          <span class="fw-500">{{ selectedPatient()?.nom }} {{ selectedPatient()?.prenom }}</span>
+        </div>
+        @if (!isRenewal()) {
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="backToPatientStep()">
+            <i antIcon type="left" theme="outline" class="me-1"></i>
+            {{ 'prescription.createWizard.stepConsultation.back' | transloco }}
+          </button>
+        }
+      </div>
+
+      @if (consultationsLoading()) {
+        <div class="text-center p-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+          </div>
+        </div>
+      } @else if (consultationsError()) {
+        <div class="alert alert-danger" role="alert">
+          {{ consultationsError() }}
+          <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="retryLoadConsultations()">
+            {{ 'common.buttons.retry' | transloco }}
+          </button>
+        </div>
+      } @else if (noRecord() || consultations().length === 0) {
+        <div class="text-center p-4">
+          <i antIcon type="file-text" theme="outline" class="f-48 text-muted mb-3"></i>
+          <h6 class="mb-1">{{ 'prescription.createWizard.stepConsultation.empty.title' | transloco }}</h6>
+          <p class="text-muted mb-3">{{ 'prescription.createWizard.stepConsultation.empty.text' | transloco }}</p>
+          <button type="button" class="btn btn-primary btn-sm" (click)="goCreateConsultation(modal)">
+            {{ 'prescription.createWizard.stepConsultation.empty.action' | transloco }}
+          </button>
+        </div>
+      } @else {
+        <div class="list-group">
+          @for (c of consultations(); track c.id) {
+            <button type="button" class="list-group-item list-group-item-action" (click)="selectConsultation(c, modal)">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-500">{{ c.consultationDate | dateFormat }}</span>
+                <span class="text-muted">{{ c.motif }}</span>
+              </div>
+            </button>
+          }
+        </div>
+      }
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+  </div>
+</ng-template>
+
+<app-prescription-edit-modal (saved)="onPrescriptionSaved($event)" />

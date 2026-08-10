@@ -1,0 +1,4 @@
+<span class="badge rounded-pill" [ngClass]="badgeClass()">
+  <i antIcon [type]="icon().type" [theme]="icon().theme" class="me-1" aria-hidden="true"></i>
+  {{ ('appointment.statut.' + statut()) | transloco }}
+</span>

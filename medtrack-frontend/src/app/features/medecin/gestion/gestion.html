@@ -1,0 +1,456 @@
+<div class="row">
+  <div class="col-12 mb-3">
+    <div class="management-section-nav d-flex flex-wrap justify-content-between align-items-end gap-3 border-bottom">
+      <div class="app-tab-nav nav nav-tabs border-bottom-0" role="tablist" [attr.aria-label]="'medecin.gestion.tabs.label' | transloco">
+        <button
+          #medecinsTab
+          type="button"
+          id="medecins-tab"
+          class="nav-link"
+          role="tab"
+          [class.active]="activeSection() === 'medecins'"
+          [attr.aria-selected]="activeSection() === 'medecins'"
+          aria-controls="medecins-panel"
+          (click)="showSection('medecins')"
+          (keydown.arrowright)="showSection('invitations'); invitationsTab.focus(); $event.preventDefault()"
+          (keydown.end)="showSection('invitations'); invitationsTab.focus(); $event.preventDefault()"
+        >
+          {{ 'medecin.gestion.listTitle' | transloco }}
+        </button>
+        <button
+          #invitationsTab
+          type="button"
+          id="invitations-tab"
+          class="nav-link"
+          role="tab"
+          [class.active]="activeSection() === 'invitations'"
+          [attr.aria-selected]="activeSection() === 'invitations'"
+          aria-controls="invitations-panel"
+          (click)="showSection('invitations')"
+          (keydown.arrowleft)="showSection('medecins'); medecinsTab.focus(); $event.preventDefault()"
+          (keydown.home)="showSection('medecins'); medecinsTab.focus(); $event.preventDefault()"
+        >
+          {{ 'invitation.list.title' | transloco }} @if (pendingInvitationCount() > 0) {
+          <span class="badge rounded-pill text-bg-primary ms-1">{{ pendingInvitationCount() }}</span>
+          }
+        </button>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm text-nowrap mb-2" (click)="openInviteModal()">
+        <i antIcon type="user-add" theme="outline" class="me-1"></i>
+        {{ 'invitation.form.title' | transloco }}
+      </button>
+    </div>
+  </div>
+
+  @if (activeSection() === 'medecins') {
+  <div class="col-12" id="medecins-panel" role="tabpanel" aria-labelledby="medecins-tab">
+    <app-card [showHeader]="true" [cardTitle]="'medecin.gestion.listTitle' | transloco" [padding]="0">
+      <div class="p-3 border-bottom">
+        <app-advanced-filters
+          [(panelOpen)]="filtersPanelOpen"
+          [quickSearchValue]="searchInput()"
+          (quickSearchValueChange)="searchInput.set($event)"
+          (quickSearchDebounced)="onSearchChange($event)"
+          [activeFilterCount]="activeFilterCount()"
+          [chips]="filterChips()"
+          (chipRemove)="onFilterChipRemove($event)"
+          (resetAll)="onResetAllFilters()"
+          (applyRequested)="onApplyPanelFilters()"
+        >
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">{{ 'medecin.gestion.filters.nomLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="nomInput()"
+                (ngModelChange)="nomInput.set($event)"
+                appDebounceInput
+                (debouncedInput)="onNomFilterChange($event)"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'medecin.gestion.filters.prenomLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="prenomInput()"
+                (ngModelChange)="prenomInput.set($event)"
+                appDebounceInput
+                (debouncedInput)="onPrenomFilterChange($event)"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'medecin.gestion.filters.specialiteLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="specialiteInput()"
+                (ngModelChange)="specialiteInput.set($event)"
+                appDebounceInput
+                (debouncedInput)="onSpecialiteFilterChange($event)"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'medecin.gestion.filters.numeroOrdreLabel' | transloco }}</label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                [ngModel]="numeroOrdreInput()"
+                (ngModelChange)="numeroOrdreInput.set($event)"
+                appDebounceInput
+                (debouncedInput)="onNumeroOrdreFilterChange($event)"
+                [placeholder]="'medecin.gestion.filters.numeroOrdrePlaceholder' | transloco"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'medecin.gestion.filters.statutLabel' | transloco }}</label>
+              <select class="form-select form-select-sm" [ngModel]="actifFilter()" (ngModelChange)="onActifFilterChange($event)">
+                <option value="">{{ 'medecin.gestion.filters.statutAll' | transloco }}</option>
+                <option value="true">{{ 'medecin.gestion.status.actif' | transloco }}</option>
+                <option value="false">{{ 'medecin.gestion.status.inactif' | transloco }}</option>
+              </select>
+            </div>
+          </div>
+        </app-advanced-filters>
+      </div>
+      <div class="table-responsive">
+        @if (isLoading()) {
+        <div class="text-center p-5">
+          <app-spinner [backgroundColor]="'var(--bs-primary)'" [spinner]="spinkit"></app-spinner>
+          <p class="mt-3 text-muted">{{ 'medecin.gestion.loading' | transloco }}</p>
+        </div>
+        } @else if (listError()) {
+        <div class="alert alert-danger m-3" role="alert">
+          {{ listError() }}
+          <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="loadMedecins()">
+            {{ 'common.buttons.retry' | transloco }}
+          </button>
+        </div>
+        } @else if (medecins().length === 0) {
+        <div class="text-center p-5">
+          <i antIcon type="team" theme="outline" class="f-48 text-muted mb-3"></i>
+          @if (searchTerm()) {
+          <h5 class="text-muted">{{ 'common.search.noResults' | transloco: { term: searchTerm() } }}</h5>
+          <button type="button" class="btn btn-outline-secondary mt-2" (click)="onResetSearch()">
+            {{ 'common.search.reset' | transloco }}
+          </button>
+          } @else {
+          <h5 class="text-muted">{{ 'medecin.gestion.empty.title' | transloco }}</h5>
+          <p class="text-muted">{{ 'medecin.gestion.empty.text' | transloco }}</p>
+          }
+        </div>
+        } @else {
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col" appSortableColumn="nom" [sortState]="sortState()" (sortChange)="onSortChange($event)">
+                {{ 'medecin.gestion.columns.medecin' | transloco }}
+              </th>
+              <th scope="col" appSortableColumn="email" [sortState]="sortState()" (sortChange)="onSortChange($event)">
+                {{ 'medecin.gestion.columns.email' | transloco }}
+              </th>
+              <th scope="col" appSortableColumn="specialite" [sortState]="sortState()" (sortChange)="onSortChange($event)">
+                {{ 'medecin.gestion.columns.specialite' | transloco }}
+              </th>
+              <th scope="col" appSortableColumn="numeroOrdre" [sortState]="sortState()" (sortChange)="onSortChange($event)">
+                {{ 'medecin.gestion.columns.numeroOrdre' | transloco }}
+              </th>
+              <th scope="col">{{ 'medecin.gestion.columns.statut' | transloco }}</th>
+              <th scope="col" class="text-center">{{ 'common.labels.actions' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (medecin of medecins(); track medecin.id) {
+            <tr>
+              <td class="f-w-500">
+                <a
+                  class="table-record-link"
+                  [routerLink]="['/medecins', medecin.id]"
+                  [attr.aria-label]="('common.buttons.view' | transloco) + ' ' + medecin.nom + ' ' + medecin.prenom"
+                >
+                  {{ medecin.nom }} {{ medecin.prenom }}
+                </a>
+                @if (!medecin.specialite || !medecin.numeroOrdre) {
+                <i
+                  antIcon
+                  type="warning"
+                  theme="outline"
+                  class="text-warning ms-1"
+                  role="img"
+                  [ngbTooltip]="'medecin.gestion.profilIncomplet' | transloco"
+                  [attr.aria-label]="'medecin.gestion.profilIncomplet' | transloco"
+                  container="body"
+                ></i>
+                }
+              </td>
+              <td><app-email-link [value]="medecin.email" /></td>
+              <td>{{ medecin.specialite || '—' }}</td>
+              <td>{{ medecin.numeroOrdre || '—' }}</td>
+              <td>
+                <app-medecin-statut-badge [actif]="medecin.actif" />
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <a
+                    class="btn btn-outline-primary"
+                    [routerLink]="['/medecins', medecin.id]"
+                    [ngbTooltip]="'common.buttons.view' | transloco"
+                    [attr.aria-label]="'common.buttons.view' | transloco"
+                    container="body"
+                  >
+                    <i antIcon type="eye" theme="outline"></i>
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="onEdit(medecin)"
+                    [ngbTooltip]="'common.buttons.edit' | transloco"
+                    [attr.aria-label]="'common.buttons.edit' | transloco"
+                    container="body"
+                  >
+                    <i antIcon type="edit" theme="outline"></i>
+                  </button>
+                  @if (medecin.actif) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="onToggle(medecin)"
+                    [ngbTooltip]="'medecin.actions.deactivate' | transloco"
+                    [attr.aria-label]="'medecin.actions.deactivate' | transloco"
+                    container="body"
+                  >
+                    <i antIcon type="stop" theme="outline"></i>
+                  </button>
+                  } @else {
+                  <button
+                    type="button"
+                    class="btn btn-outline-success"
+                    (click)="onToggle(medecin)"
+                    [ngbTooltip]="'medecin.actions.reactivate' | transloco"
+                    [attr.aria-label]="'medecin.actions.reactivate' | transloco"
+                    container="body"
+                  >
+                    <i antIcon type="check" theme="outline"></i>
+                  </button>
+                  }
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+        <div class="p-3 border-top">
+          <app-pagination
+            [page]="page()"
+            [totalPages]="totalPages()"
+            [totalElements]="totalElements()"
+            [size]="size()"
+            (pageChange)="onPageChange($event)"
+            (sizeChange)="onSizeChange($event)"
+          />
+        </div>
+        }
+      </div>
+    </app-card>
+  </div>
+  } @if (activeSection() === 'invitations') {
+  <div class="col-12" id="invitations-panel" role="tabpanel" aria-labelledby="invitations-tab">
+    <app-card [showHeader]="true" [cardTitle]="'invitation.list.title' | transloco" [padding]="0">
+      <div class="table-responsive">
+        @if (invitationsLoading()) {
+        <div class="text-center p-5">
+          <app-spinner [backgroundColor]="'var(--bs-primary)'" [spinner]="spinkit"></app-spinner>
+          <p class="mt-3 text-muted">{{ 'invitation.list.loading' | transloco }}</p>
+        </div>
+        } @else if (invitationsError()) {
+        <div class="alert alert-danger m-3" role="alert">
+          {{ invitationsError() }}
+          <button type="button" class="btn btn-outline-danger btn-sm ms-2" (click)="loadInvitations()">
+            {{ 'common.buttons.retry' | transloco }}
+          </button>
+        </div>
+        } @else if (invitations().length === 0) {
+        <div class="text-center p-5">
+          <i antIcon type="user-add" theme="outline" class="f-48 text-muted mb-3"></i>
+          <h5 class="text-muted">{{ 'invitation.list.empty.title' | transloco }}</h5>
+          <p class="text-muted">{{ 'invitation.list.empty.text' | transloco }}</p>
+        </div>
+        } @else {
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">{{ 'invitation.list.columns.email' | transloco }}</th>
+              <th scope="col">{{ 'invitation.list.columns.statut' | transloco }}</th>
+              <th scope="col">{{ 'invitation.list.columns.expiration' | transloco }}</th>
+              <th scope="col">{{ 'invitation.list.columns.invitedBy' | transloco }}</th>
+              <th scope="col" class="text-center">{{ 'common.labels.actions' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (inv of invitations(); track inv.id) {
+            <tr>
+              <td class="f-w-500"><app-email-link [value]="inv.email" /></td>
+              <td>
+                @switch (inv.status) { @case ('PENDING') {
+                <span class="badge rounded-pill badge-statut-planifie">
+                  <i antIcon type="clock-circle" theme="outline" class="me-1" aria-hidden="true"></i>
+                  {{ 'invitation.status.pending' | transloco }}
+                </span>
+                } @case ('EXPIRED') {
+                <span class="badge rounded-pill bg-warning-subtle text-warning">
+                  <i antIcon type="warning" theme="outline" class="me-1" aria-hidden="true"></i>
+                  {{ 'invitation.status.expired' | transloco }}
+                </span>
+                } @case ('ACCEPTED') {
+                <span class="badge rounded-pill badge-statut-confirme">
+                  <i antIcon type="check" theme="outline" class="me-1" aria-hidden="true"></i>
+                  {{ 'invitation.status.accepted' | transloco }}
+                </span>
+                } @case ('REVOKED') {
+                <span class="badge rounded-pill badge-statut-annule">
+                  <i antIcon type="close-circle" theme="outline" class="me-1" aria-hidden="true"></i>
+                  {{ 'invitation.status.revoked' | transloco }}
+                </span>
+                } }
+              </td>
+              <td>{{ inv.expirationDate | dateTimeFormat }}</td>
+              <td>{{ inv.invitedByName || '—' }}</td>
+              <td class="text-center">
+                @if (inv.status === 'PENDING' || inv.status === 'EXPIRED') {
+                <div class="btn-group btn-group-sm" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    [disabled]="resendingEmail() === inv.email"
+                    (click)="onResendInvitation(inv)"
+                    [ngbTooltip]="'invitation.list.resendTooltip' | transloco"
+                    [attr.aria-label]="'invitation.list.resendTooltip' | transloco"
+                    container="body"
+                  >
+                    @if (resendingEmail() === inv.email) {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    } @else {
+                    <i antIcon type="reload" theme="outline"></i>
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    [disabled]="revokingId() === inv.id"
+                    (click)="onRevokeInvitation(inv)"
+                    [ngbTooltip]="'invitation.actions.revoke' | transloco"
+                    [attr.aria-label]="'invitation.actions.revoke' | transloco"
+                    container="body"
+                  >
+                    @if (revokingId() === inv.id) {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    } @else {
+                    <i antIcon type="close-circle" theme="outline"></i>
+                    }
+                  </button>
+                </div>
+                }
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+        }
+      </div>
+    </app-card>
+  </div>
+  }
+</div>
+
+<ng-template #confirmRevokeModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'invitation.confirmRevoke.title' | transloco }}</h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    {{ 'invitation.confirmRevoke.body' | transloco }}
+    <strong>{{ pendingInvitation?.email }}</strong>
+    ?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">{{ 'invitation.actions.revoke' | transloco }}</button>
+  </div>
+</ng-template>
+
+<ng-template #confirmModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'medecin.gestion.confirmModal.title' | transloco }}</h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <div class="modal-body">
+    {{ 'medecin.gestion.confirmModal.bodyBefore' | transloco }}
+    <strong>{{ pendingActionKey | transloco }}</strong>
+    {{ 'medecin.gestion.confirmModal.bodyMiddle' | transloco }}
+    <strong>{{ pendingMedecin?.nom }} {{ pendingMedecin?.prenom }}</strong>
+    ?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+      {{ 'common.buttons.cancel' | transloco }}
+    </button>
+    <button type="button" class="btn btn-danger" (click)="modal.close('confirm')">{{ 'common.buttons.confirm' | transloco }}</button>
+  </div>
+</ng-template>
+
+<ng-template #inviteModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'invitation.form.title' | transloco }}</h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <form #invitationForm="ngForm" (ngSubmit)="onSubmitInvitation(invitationForm, modal)">
+    <div class="modal-body">
+      @if (invitationError()) {
+      <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+        {{ invitationError() }}
+        <button type="button" class="btn-close" (click)="invitationError.set(null)" aria-label="Fermer"></button>
+      </div>
+      }
+
+      <div class="form-group mb-0">
+        <label class="form-label" for="email">{{ 'invitation.form.emailLabel' | transloco }}</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          required
+          email
+          #emailField="ngModel"
+          [class.is-invalid]="invitationForm.submitted && emailField.invalid"
+          [placeholder]="'invitation.form.emailPlaceholder' | transloco"
+        />
+        @if (invitationForm.submitted && emailField.invalid) {
+        <div class="invalid-feedback">
+          @if (emailField.errors?.['required']) {
+          <div>{{ 'invitation.form.emailRequired' | transloco }}</div>
+          } @if (emailField.errors?.['email']) {
+          <div>{{ 'invitation.form.emailInvalid' | transloco }}</div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.cancel' | transloco }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="invitationLoading()">
+        @if (invitationLoading()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        } {{ 'invitation.form.submit' | transloco }}
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<app-medecin-edit-modal (saved)="onMedecinSaved()" />

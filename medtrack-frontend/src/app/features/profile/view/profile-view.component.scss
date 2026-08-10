@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+.fw-medium {
+  color: #212529;
+}
+.badge {
+  font-size: 0.8125rem;
+  letter-spacing: 0.03em;
+}
+
+.profile-summary {
+  text-align: center;
+}
+
+@media (min-width: 992px) {
+  .profile-summary {
+    border-right: 1px solid var(--bs-border-color);
+  }
+}
+
+.profile-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--bs-border-color);
+
+  h6 {
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+}
+
+.field-label {
+  margin-bottom: 0.25rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.field-value {
+  margin-bottom: 0;
+  color: var(--bs-body-color);
+  font-weight: 500;
+}

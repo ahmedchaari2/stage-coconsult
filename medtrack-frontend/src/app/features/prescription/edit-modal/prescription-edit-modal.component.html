@@ -1,0 +1,99 @@
+<ng-template #editModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ (mode() === 'create' ? 'prescription.editModal.createTitle' : 'prescription.editModal.title') | transloco }}
+    </h5>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss('cancel')"></button>
+  </div>
+  <form #prescriptionEditForm="ngForm" (ngSubmit)="onSubmit(prescriptionEditForm, modal)">
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label required" for="editPrescriptionMedicament">{{ 'prescription.fields.medicament' | transloco }}</label>
+          <input
+            type="text"
+            id="editPrescriptionMedicament"
+            class="form-control"
+            name="medicament"
+            [(ngModel)]="model.medicament"
+            required
+            #medicamentField="ngModel"
+            [class.is-invalid]="submitted() && medicamentField.invalid"
+            [placeholder]="'prescription.placeholders.medicament' | transloco"
+          />
+          @if (submitted() && medicamentField.invalid) {
+            <div class="invalid-feedback">{{ 'prescription.errors.medicamentRequired' | transloco }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label required" for="editPrescriptionPosologie">{{ 'prescription.fields.posologie' | transloco }}</label>
+          <input
+            type="text"
+            id="editPrescriptionPosologie"
+            class="form-control"
+            name="posologie"
+            [(ngModel)]="model.posologie"
+            required
+            #posologieField="ngModel"
+            [class.is-invalid]="submitted() && posologieField.invalid"
+            [placeholder]="'prescription.placeholders.posologie' | transloco"
+          />
+          @if (submitted() && posologieField.invalid) {
+            <div class="invalid-feedback">{{ 'prescription.errors.posologieRequired' | transloco }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="editPrescriptionDuree">{{ 'prescription.fields.dureeJours' | transloco }}</label>
+          <input
+            type="number"
+            id="editPrescriptionDuree"
+            class="form-control"
+            name="dureeJours"
+            min="1"
+            [(ngModel)]="model.dureeJours"
+            #dureeField="ngModel"
+            [class.is-invalid]="submitted() && dureeField.invalid"
+            [placeholder]="'prescription.placeholders.dureeJours' | transloco"
+          />
+          @if (submitted() && dureeField.invalid) {
+            <div class="invalid-feedback">{{ 'prescription.errors.dureeJoursInvalid' | transloco }}</div>
+          }
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="editPrescriptionInstructions">{{ 'prescription.fields.instructions' | transloco }}</label>
+          <textarea
+            id="editPrescriptionInstructions"
+            class="form-control"
+            name="instructions"
+            rows="2"
+            [(ngModel)]="model.instructions"
+            [placeholder]="'prescription.placeholders.instructions' | transloco"
+          ></textarea>
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="editPrescriptionRenouvelable"
+              name="renouvelable"
+              [(ngModel)]="model.renouvelable"
+            />
+            <label class="form-check-label" for="editPrescriptionRenouvelable">{{ 'prescription.fields.renouvelable' | transloco }}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">
+        {{ 'common.buttons.cancel' | transloco }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+        @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        }
+        {{ 'common.buttons.save' | transloco }}
+      </button>
+    </div>
+  </form>
+</ng-template>
